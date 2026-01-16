@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "yourscraft.jasdewstarfield.createkineticinterference.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MixinWindmillBearingBlockEntity"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
