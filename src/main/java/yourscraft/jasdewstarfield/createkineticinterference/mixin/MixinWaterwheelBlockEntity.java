@@ -119,7 +119,7 @@ public abstract class MixinWaterwheelBlockEntity extends GeneratingKineticBlockE
     private void onLazyTick(CallbackInfo ci) {
         if (level == null || level.isClientSide) return;
 
-        KineticInterferenceHandler.updateTrackingState(this, super.calculateAddedStressCapacity() > 0);
+        KineticInterferenceHandler.updateTrackingState(this, isActiveSource());
 
         if (getGeneratedSpeed() == 0) return;
 
@@ -146,7 +146,7 @@ public abstract class MixinWaterwheelBlockEntity extends GeneratingKineticBlockE
         boolean success = super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
         // 只有当在运行且效率不为 100% 时才显示
-        if (getGeneratedSpeed() > 0 && custom$efficiencyFactor < 1.0f) {
+        if (Math.abs(getGeneratedSpeed()) > 0 && custom$efficiencyFactor < 1.0f) {
             // 运行效率
             CreateLang.text("  ")
                     .add(CreateLang.translate("hint.interference_efficiency").style(ChatFormatting.DARK_GRAY))

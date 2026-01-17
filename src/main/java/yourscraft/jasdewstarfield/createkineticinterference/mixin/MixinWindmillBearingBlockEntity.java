@@ -131,7 +131,7 @@ public class MixinWindmillBearingBlockEntity extends MechanicalBearingBlockEntit
     private void interferenceTick(CallbackInfo ci) {
         if (level == null || level.isClientSide) return;
 
-        KineticInterferenceHandler.updateTrackingState(this, super.calculateAddedStressCapacity() > 0);
+        KineticInterferenceHandler.updateTrackingState(this, isActiveSource());
 
         if (!isRunning()) return;
 
