@@ -7,10 +7,12 @@ import java.util.Set;
 
 public interface IKineticInterference {
 
-    // --- 核心数据存取 ---
+    // --- 配置参数 ---
     float getEfficiencyFactor();
     void setEfficiencyFactor(float factor);
+    DistanceType getDistanceType();
 
+    // --- 核心数据存取 ---
     int getNearbyCount();
     void setNearbyCount(int count);
 
@@ -23,7 +25,6 @@ public interface IKineticInterference {
     // --- 上下文获取 (由 BlockEntity 提供) ---
     Level getLevel();
     BlockPos getBlockPos();
-    boolean isRemoved();
 
     // --- 配置参数 (由具体实现提供) ---
     double getInterferenceRadius();

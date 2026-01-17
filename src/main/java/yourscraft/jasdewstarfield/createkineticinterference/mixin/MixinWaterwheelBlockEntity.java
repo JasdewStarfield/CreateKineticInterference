@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import yourscraft.jasdewstarfield.createkineticinterference.CreatekineticinterferenceConfig;
+import yourscraft.jasdewstarfield.createkineticinterference.common.DistanceType;
 import yourscraft.jasdewstarfield.createkineticinterference.common.IKineticInterference;
 import yourscraft.jasdewstarfield.createkineticinterference.common.KineticInterferenceHandler;
 import yourscraft.jasdewstarfield.createkineticinterference.common.KineticInterferenceManager;
@@ -44,6 +45,7 @@ public abstract class MixinWaterwheelBlockEntity extends GeneratingKineticBlockE
     // --- 基础 Getter/Setter ---
     @Override public float getEfficiencyFactor() { return custom$efficiencyFactor; }
     @Override public void setEfficiencyFactor(float factor) { this.custom$efficiencyFactor = factor; }
+    @Override public DistanceType getDistanceType() { return CreatekineticinterferenceConfig.SERVER.waterwheelDistanceType.get(); }
     @Override public int getNearbyCount() { return custom$nearbyCount; }
     @Override public void setNearbyCount(int count) { this.custom$nearbyCount = count; }
     @Override public boolean isTracked() { return custom$isTracked; }

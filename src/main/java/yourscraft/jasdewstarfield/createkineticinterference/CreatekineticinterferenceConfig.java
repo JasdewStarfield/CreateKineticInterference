@@ -2,6 +2,7 @@ package yourscraft.jasdewstarfield.createkineticinterference;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
+import yourscraft.jasdewstarfield.createkineticinterference.common.DistanceType;
 
 public class CreatekineticinterferenceConfig {
     public static final ServerConfig SERVER;
@@ -14,12 +15,12 @@ public class CreatekineticinterferenceConfig {
     }
 
     public static class ServerConfig {
-        public final ModConfigSpec.BooleanValue windmillEnable;
         public final ModConfigSpec.DoubleValue windmillInterferenceRadius;
+        public final ModConfigSpec.EnumValue<DistanceType> windmillDistanceType;
         public final ModConfigSpec.DoubleValue windmillInterferenceFactor;
         public final ModConfigSpec.IntValue windmillCheckInterval;
-        public final ModConfigSpec.BooleanValue waterwheelEnable;
         public final ModConfigSpec.DoubleValue waterwheelInterferenceRadius;
+        public final ModConfigSpec.EnumValue<DistanceType> waterwheelDistanceType;
         public final ModConfigSpec.DoubleValue waterwheelInterferenceFactor;
 
         ServerConfig(ModConfigSpec.Builder builder) {
@@ -27,13 +28,17 @@ public class CreatekineticinterferenceConfig {
 
             builder.push("windmill");
 
-            windmillEnable = builder
-                    .comment("Enable interference for windmills")
-                    .define("", true);
-
             windmillInterferenceRadius = builder
                     .comment("Detection radius for windmill interference (blocks)")
                     .defineInRange("interferenceRadius", 32.0, 1.0, 1024.0);
+
+            windmillDistanceType = builder
+                    .comment("Distance calculation mode for windmills")
+                    .comment("EUCLIDEAN_3D: Standard 3D distance (Spherical)")
+                    .comment("EUCLIDEAN_2D: Ignore height difference (Cylindrical)")
+                    .comment("MANHATTAN_3D: Manhattan distance (Grid based)")
+                    .comment("MANHATTAN_2D: Manhattan distance in 2D (Plane-grid based)")
+                    .defineEnum("distanceCalculationMode", DistanceType.EUCLIDEAN_2D);
 
             windmillInterferenceFactor = builder
                     .comment("Interference factor for windmills")
@@ -51,14 +56,17 @@ public class CreatekineticinterferenceConfig {
 
             builder.push("waterwheel");
 
-            waterwheelEnable = builder
-                    .comment("Enable interference for waterwheels")
-                    .comment("Create has a Lazytick logic for waterwheels, so the interval cannot be defined.")
-                    .define("", true);
-
             waterwheelInterferenceRadius = builder
                     .comment("Detection radius for waterwheel interference (blocks)")
                     .defineInRange("interferenceRadius", 32.0, 1.0, 1024.0);
+
+            waterwheelDistanceType = builder
+                    .comment("Distance calculation mode for waterwheels")
+                    .comment("EUCLIDEAN_3D: Standard 3D distance (Spherical)")
+                    .comment("EUCLIDEAN_2D: Ignore height difference (Cylindrical)")
+                    .comment("MANHATTAN_3D: Manhattan distance (Grid based)")
+                    .comment("MANHATTAN_2D: Manhattan distance in 2D (Plane-grid based)")
+                    .defineEnum("distanceCalculationMode", DistanceType.EUCLIDEAN_2D);
 
             waterwheelInterferenceFactor = builder
                     .comment("Interference factor for waterwheels")

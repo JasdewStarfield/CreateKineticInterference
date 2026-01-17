@@ -4,6 +4,7 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -82,22 +83,7 @@ public class KineticInterferenceHandler {
         // 1. 准备参数
         double radius = self.getInterferenceRadius();
         double factor = self.getInterferenceFactor();
-        double radiusSqr = radius * radius;
-        BlockPos selfPos = self.getBlockPos();
-
-        // 2. 扫描周围的活跃同类
-        Set<BlockPos> currentSources = new HashSet<>();
-        Set<BlockPos> activePositions = self.getActivePeers();
-
-        for (BlockPos pos : activePositions) {
-            // 跳过自身
-            if (pos.equals(selfPos)) continue;
-            // 距离检测
-            if (pos.distSqr(selfPos) <= radiusSqr) {
-                currentSources.add(pos);
-            }
-        }
-
+        Set<BlockPos> currentSources = getInterferingBlockPos(self, radius);
         boolean dataChanged = false;
 
         // 3. 更新干扰源列表 (元数据)
@@ -132,5 +118,58 @@ public class KineticInterferenceHandler {
 
         // 返回是否需要触发动力网络更新
         return efficiencyChanged;
+    }
+
+    // 获取干扰源列表
+    private static @NotNull Set<BlockPos> getInterferingBlockPos(IKineticInterference self, double radius) {
+        double radiusSqr = radius * radius;
+        BlockPos selfPos = self.getBlockPos();
+        DistanceType distanceType = self.getDistanceType();
+
+        // 扫描周围的活跃同类
+        Set<BlockPos> currentSources = new HashSet<>();
+        Set<BlockPos> activePositions = self.getActivePeers();
+
+        for (BlockPos pos : activePositions) {
+            // 跳过自身
+            if (pos.equals(selfPos)) continue;
+            // 距离检测
+            boolean inRange;
+            switch (distanceType) {
+                case MANHATTAN_2D:
+                    // 平面曼哈顿距离：|x1-x2| + |z1-z2|
+                    double manhattanDist2D = Math.abs(pos.getX() - selfPos.getX())
+                            + Math.abs(pos.getZ() - selfPos.getZ());
+                    inRange = manhattanDist2D <= radius;
+                    break;
+
+                case MANHATTAN_3D:
+                    // 曼哈顿距离：|x1-x2| + |y1-y2| + |z1-z2|
+                    double manhattanDist = Math.abs(pos.getX() - selfPos.getX())
+                            + Math.abs(pos.getY() - selfPos.getY())
+                            + Math.abs(pos.getZ() - selfPos.getZ());
+                    inRange = manhattanDist <= radius;
+                    break;
+
+                case EUCLIDEAN_2D:
+                    // 平面距离：忽略 Y 轴，只计算 X 和 Z
+                    double dX = pos.getX() - selfPos.getX();
+                    double dZ = pos.getZ() - selfPos.getZ();
+                    double distSqr2D = dX * dX + dZ * dZ;
+                    inRange = distSqr2D <= radiusSqr;
+                    break;
+
+                case EUCLIDEAN_3D:
+                default:
+                    // 原版 3D 距离
+                    inRange = pos.distSqr(selfPos) <= radiusSqr;
+                    break;
+            }
+
+            if (inRange) {
+                currentSources.add(pos);
+            }
+        }
+        return currentSources;
     }
 }
