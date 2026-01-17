@@ -1,7 +1,13 @@
 {
   "create.hint.interference_efficiency": "Stress Efficiency: ",
-  "create.hint.interference_source_pre": "Interfered by  ",
-  "create.hint.interference_source": " windmill(s) nearby",
-  "create.hint.interference_hint_pre": "It seems that other windmill(s) within ",
-  "create.hint.interference_hint": " blocks have affected the air flow"
+
+  "create.hint.windmill.interference_source_pre": "Interfered by  ",
+  "create.hint.windmill.interference_source": " windmill(s) nearby",
+  "create.hint.windmill.interference_hint_pre": "It seems that other windmill(s) within ",
+  "create.hint.windmill.interference_hint": " blocks have affected the air flow",
+
+  "create.hint.waterwheel.waterwheel.interference_source_pre": "Interfered by  ",
+  "create.hint.waterwheel.interference_source": " waterwheel(s) nearby",
+  "create.hint.waterwheel.interference_hint_pre": "It seems that other waterwheel(s) within ",
+  "create.hint.waterwheel.interference_hint": " blocks have affected the water current"
 }

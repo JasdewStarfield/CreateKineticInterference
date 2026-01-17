@@ -2,7 +2,6 @@ package yourscraft.jasdewstarfield.createkineticinterference.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.simibubi.create.content.contraptions.bearing.WindmillBearingBlockEntity;
 import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -17,14 +16,14 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import yourscraft.jasdewstarfield.createkineticinterference.Createkineticinterference;
 import yourscraft.jasdewstarfield.createkineticinterference.CreatekineticinterferenceClientConfig;
-import yourscraft.jasdewstarfield.createkineticinterference.common.IWindmillInterference;
+import yourscraft.jasdewstarfield.createkineticinterference.common.IKineticInterference;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @EventBusSubscriber(modid = Createkineticinterference.MODID, value = Dist.CLIENT)
-public class WindmillClientHandler {
+public class InterferenceClientHandler {
 
     // 存储高亮目标及其过期时间
     private static final Map<BlockPos, Long> HIGHLIGHTS = new ConcurrentHashMap<>();
@@ -46,9 +45,9 @@ public class WindmillClientHandler {
         }
 
         BlockEntity be = event.getLevel().getBlockEntity(event.getPos());
-        if (be instanceof WindmillBearingBlockEntity && be instanceof IWindmillInterference interference) {
+        if (be instanceof IKineticInterference interference) {
 
-            Set<BlockPos> sources = interference.createKineticInterference$getInterferenceSources();
+            Set<BlockPos> sources = interference.getInterferenceSources();
 
             if (sources == null || sources.isEmpty()) {
                 return;

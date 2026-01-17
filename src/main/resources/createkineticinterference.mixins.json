@@ -4,6 +4,7 @@
   "package": "yourscraft.jasdewstarfield.createkineticinterference.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "MixinWaterwheelBlockEntity",
     "MixinWindmillBearingBlockEntity"
   ],
   "client": [

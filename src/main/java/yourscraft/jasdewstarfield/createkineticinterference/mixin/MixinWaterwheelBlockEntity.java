@@ -1,7 +1,7 @@
 package yourscraft.jasdewstarfield.createkineticinterference.mixin;
 
-import com.simibubi.create.content.contraptions.bearing.MechanicalBearingBlockEntity;
-import com.simibubi.create.content.contraptions.bearing.WindmillBearingBlockEntity;
+import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
+import com.simibubi.create.content.kinetics.waterwheel.WaterWheelBlockEntity;
 import com.simibubi.create.foundation.utility.CreateLang;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -24,10 +24,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Mixin(WindmillBearingBlockEntity.class)
-public class MixinWindmillBearingBlockEntity extends MechanicalBearingBlockEntity implements IKineticInterference {
-
-    public MixinWindmillBearingBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+@Mixin(WaterWheelBlockEntity.class)
+public abstract class MixinWaterwheelBlockEntity extends GeneratingKineticBlockEntity implements IKineticInterference {
+    public MixinWaterwheelBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
 
@@ -53,11 +52,11 @@ public class MixinWindmillBearingBlockEntity extends MechanicalBearingBlockEntit
     @Override public void setInterferenceSources(Set<BlockPos> sources) { this.custom$interferenceSources = sources; }
 
     // 参数配置
-    @Override public double getInterferenceRadius() { return CreatekineticinterferenceConfig.SERVER.windmillInterferenceRadius.get(); }
-    @Override public double getInterferenceFactor() { return CreatekineticinterferenceConfig.SERVER.windmillInterferenceFactor.get(); }
-    @Override public Set<BlockPos> getActivePeers() { return KineticInterferenceManager.getWindmillsInLevel(this.level); }
-    @Override public void trackSelf() { KineticInterferenceManager.trackWindmill((WindmillBearingBlockEntity)(Object)this); }
-    @Override public void untrackSelf() { KineticInterferenceManager.untrackWindmill((WindmillBearingBlockEntity)(Object)this); }
+    @Override public double getInterferenceRadius() { return CreatekineticinterferenceConfig.SERVER.waterwheelInterferenceRadius.get(); }
+    @Override public double getInterferenceFactor() { return CreatekineticinterferenceConfig.SERVER.waterwheelInterferenceFactor.get(); }
+    @Override public Set<BlockPos> getActivePeers() { return KineticInterferenceManager.getWaterWheelsInLevel(this.level); }
+    @Override public void trackSelf() { KineticInterferenceManager.trackWaterWheel((WaterWheelBlockEntity) (Object)this); }
+    @Override public void untrackSelf() { KineticInterferenceManager.untrackWaterWheel((WaterWheelBlockEntity)(Object)this); }
 
     // --- 数据同步 ---
 
@@ -81,7 +80,7 @@ public class MixinWindmillBearingBlockEntity extends MechanicalBearingBlockEntit
 
     @Unique
     private boolean isActiveSource() {
-        return isRunning();
+        return Math.abs(getGeneratedSpeed()) > 0;
     }
 
     /**
@@ -90,7 +89,15 @@ public class MixinWindmillBearingBlockEntity extends MechanicalBearingBlockEntit
     @Override
     public void onLoad() {
         super.onLoad();
-        KineticInterferenceHandler.updateTrackingState(this, isActiveSource());
+        if (level != null && !level.isClientSide) {
+            boolean active = isActiveSource();
+            if (active) {
+                KineticInterferenceHandler.updateTrackingState(this, true);
+            } else {
+                untrackSelf();
+                setTracked(false);
+            }
+        }
     }
 
     /**
@@ -105,44 +112,18 @@ public class MixinWindmillBearingBlockEntity extends MechanicalBearingBlockEntit
     // --- 核心逻辑 ---
 
     /**
-     * 风车状态更新（组装/拆卸/变向）时触发。
-     * 这确保了：
-     * 1. 刚组装的风车立即被注册到 Manager。
-     * 2. 刚组装的风车立即计算一次效率，玩家无需等待。
+     * 在 lazyTick 中定期扫描周围
+     * Create 已对此进行过优化
      */
-    @Inject(method = "updateGeneratedRotation", at = @At("HEAD"))
-    private void onUpdateGeneratedRotation(CallbackInfo ci) {
-        if (level == null || level.isClientSide) return;
-
-        // 立即更新追踪状态
-        KineticInterferenceHandler.updateTrackingState(this, isActiveSource());
-
-        // 如果处于运行状态，立即进行一次计算
-        if (isActiveSource()) {
-            KineticInterferenceHandler.performCalculation(this, this);
-        }
-    }
-
-    /**
-     * 逻辑注入: 在 tick 中定期扫描周围
-     * 我们每 100 tick (5秒) 扫描一次，错峰执行以减少卡顿
-     */
-    @Inject(method = "tick", at = @At("HEAD"))
-    private void interferenceTick(CallbackInfo ci) {
+    @Inject(method = "lazyTick", at = @At("RETURN"))
+    private void onLazyTick(CallbackInfo ci) {
         if (level == null || level.isClientSide) return;
 
         KineticInterferenceHandler.updateTrackingState(this, super.calculateAddedStressCapacity() > 0);
 
-        if (!isRunning()) return;
-
-        // 错峰执行
-        int checkInterval = CreatekineticinterferenceConfig.SERVER.windmillCheckInterval.get();
-        if ((level.getGameTime() + this.worldPosition.hashCode()) % checkInterval != 0) {
-            return;
-        }
+        if (getGeneratedSpeed() == 0) return;
 
         if (KineticInterferenceHandler.performCalculation(this, this)) {
-            // 如果效率变了，必须手动触发更新，因为我们在 Tick 中
             this.updateGeneratedRotation();
         }
     }
@@ -165,7 +146,7 @@ public class MixinWindmillBearingBlockEntity extends MechanicalBearingBlockEntit
         boolean success = super.addToGoggleTooltip(tooltip, isPlayerSneaking);
 
         // 只有当在运行且效率不为 100% 时才显示
-        if (this.isRunning() && custom$efficiencyFactor < 1.0f) {
+        if (getGeneratedSpeed() > 0 && custom$efficiencyFactor < 1.0f) {
             // 运行效率
             CreateLang.text("  ")
                     .add(CreateLang.translate("hint.interference_efficiency").style(ChatFormatting.DARK_GRAY))
@@ -174,16 +155,16 @@ public class MixinWindmillBearingBlockEntity extends MechanicalBearingBlockEntit
 
             // 干扰源
             CreateLang.text("  ")
-                    .add(CreateLang.translate("hint.windmill.interference_source_pre").style(ChatFormatting.DARK_GRAY))
+                    .add(CreateLang.translate("hint.waterwheel.interference_source_pre").style(ChatFormatting.DARK_GRAY))
                     .add(CreateLang.number(custom$nearbyCount).style(ChatFormatting.GOLD))
-                    .add(CreateLang.translate("hint.windmill.interference_source").style(ChatFormatting.DARK_GRAY))
+                    .add(CreateLang.translate("hint.waterwheel.interference_source").style(ChatFormatting.DARK_GRAY))
                     .forGoggles(tooltip);
 
             if (isPlayerSneaking) {
                 CreateLang.text("  ")
-                        .add(CreateLang.translate("hint.windmill.interference_hint_pre").style(ChatFormatting.DARK_GRAY))
-                        .add(CreateLang.number(CreatekineticinterferenceConfig.SERVER.windmillInterferenceRadius.get()).style(ChatFormatting.GOLD))
-                        .add(CreateLang.translate("hint.windmill.interference_hint").style(ChatFormatting.DARK_GRAY))
+                        .add(CreateLang.translate("hint.waterwheel.interference_hint_pre").style(ChatFormatting.DARK_GRAY))
+                        .add(CreateLang.number(CreatekineticinterferenceConfig.SERVER.waterwheelInterferenceRadius.get()).style(ChatFormatting.GOLD))
+                        .add(CreateLang.translate("hint.waterwheel.interference_hint").style(ChatFormatting.DARK_GRAY))
                         .forGoggles(tooltip);
             }
         }

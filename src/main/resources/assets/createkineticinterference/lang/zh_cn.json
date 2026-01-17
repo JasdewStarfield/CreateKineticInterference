@@ -1,7 +1,13 @@
 {
   "create.hint.interference_efficiency": "应力效率：",
-  "create.hint.interference_source_pre": "受到周围 ",
-  "create.hint.interference_source": " 个风车干扰",
-  "create.hint.interference_hint_pre": "看起来周围 ",
-  "create.hint.interference_hint": " 格内的其它风车影响了气流"
+
+  "create.hint.windmill.interference_source_pre": "受到周围 ",
+  "create.hint.windmill.interference_source": " 个风车干扰",
+  "create.hint.windmill.interference_hint_pre": "看起来周围 ",
+  "create.hint.windmill.interference_hint": " 格内的其它风车影响了气流",
+
+  "create.hint.waterwheel.waterwheel.interference_source_pre": "受到周围 ",
+  "create.hint.waterwheel.interference_source": " 个水车干扰",
+  "create.hint.waterwheel.interference_hint_pre": "看起来周围 ",
+  "create.hint.waterwheel.interference_hint": " 格内的其它水车影响了水流"
 }
