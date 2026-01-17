@@ -1,8 +1,8 @@
-# Create Kinetic Interference
+# Create: Kinetic Interference
 
 ![Neoforge](https://img.shields.io/badge/Loader-NeoForge-orange) ![MC Version](https://img.shields.io/badge/Minecraft-1.21.1-green) ![Create Version](https://img.shields.io/badge/Create-6.0.9-yellow) ![License](https://img.shields.io/badge/License-MIT-blue)
 
-**Create Kinetic Interference** is an addon for the [Create](https://www.curseforge.com/minecraft/mc-mods/create) mod. Its primary goal is to balance gameplay by discouraging the "spamming" or dense stacking of free kinetic energy sources (Windmills and Waterwheels) in a small area.
+**Create: Kinetic Interference** is an addon for the [Create](https://www.curseforge.com/minecraft/mc-mods/create) mod. Its primary goal is to balance gameplay by discouraging the "spamming" or dense stacking of free kinetic energy sources (Windmills and Waterwheels) in a small area.
 
 ## 🔧 Features
 

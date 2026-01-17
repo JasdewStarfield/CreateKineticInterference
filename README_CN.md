@@ -1,8 +1,8 @@
-# Create Kinetic Interference
+# Create: Kinetic Interference
 
 ![Neoforge](https://img.shields.io/badge/Loader-NeoForge-orange) ![MC Version](https://img.shields.io/badge/Minecraft-1.21.1-green) ![Create Version](https://img.shields.io/badge/Create-6.0.9-yellow) ![License](https://img.shields.io/badge/License-MIT-blue)
 
-**Create Kinetic Interference** 是 [Create (机械动力)](https://www.curseforge.com/minecraft/mc-mods/create) 模组的一个附属。它的主要目标是通过抑制在狭小区域内“滥用”或密集堆叠免费动力源（风车和水车）来平衡游戏玩法。
+**Create: Kinetic Interference** 是 [Create (机械动力)](https://www.curseforge.com/minecraft/mc-mods/create) 模组的一个附属。它的主要目标是通过抑制在狭小区域内“滥用”或密集堆叠免费动力源（风车和水车）来平衡游戏玩法。
 
 ## 🔧 功能特性
 
