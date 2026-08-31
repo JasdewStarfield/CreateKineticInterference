@@ -41,6 +41,10 @@ $$
 
 配置文件位于 `/config/createkineticinterference-server.toml` 和 `/config/createkineticinterference-client.toml`.
 
+## 兼容性
+
+兼容性调整让本模组的应力、护目镜和移除清理逻辑与 Create Picky Wheels、Flowing Fluids 共存。区块卸载时仍保留干扰记录；查询时会自动修复已加载区块中的失效坐标。同时使用两个附属时，请按照 Create Picky Wheels 自身的 Flowing Fluids 兼容说明配置水源要求。
+
 ## 📄 许可证
 
 本项目采用 MIT License 开源。

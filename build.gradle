@@ -20,9 +20,22 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+// 测试模组单独编译和加载，不进入发布 JAR，也不使用手动客户端的世界。
+sourceSets {
+    gameTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+configurations {
+    gameTestImplementation.extendsFrom implementation
+    gameTestRuntimeOnly.extendsFrom runtimeOnly
+}
+
 neoForge {
     // Specify the version of NeoForge to use.
     version = project.neo_version
+    addModdingDependenciesTo sourceSets.gameTest
 
     // This line is optional. Access Transformers are automatically detected
     // accessTransformers.add('src/main/resources/META-INF/accesstransformer.cfg')
@@ -48,7 +61,10 @@ neoForge {
         // The gametest system is also enabled by default for other run configs under the /test command.
         gameTestServer {
             type = "gameTestServer"
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            sourceSet = sourceSets.gameTest
+            gameDirectory = project.file(providers.gradleProperty('gameTestDir').getOrElse('run/gametest'))
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'cki_tests'
+            systemProperty 'mixin.debug.export', 'true'
         }
 
         data {
@@ -85,6 +101,12 @@ neoForge {
         "${mod_id}" {
             sourceSet(sourceSets.main)
         }
+        cki_tests {
+            sourceSet(sourceSets.gameTest)
+        }
+    }
+    runs.configureEach {
+        loadedMods = name == 'gameTestServer' ? [mods[mod_id], mods.cki_tests] : [mods[mod_id]]
     }
 }
 
@@ -93,6 +115,10 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 
 dependencies {
+    // 可选兼容性样本只加入 GameTest 运行时，绝不捆绑或变成正式依赖。
+    if (providers.gradleProperty('compatModsDir').isPresent()) {
+        gameTestRuntimeOnly fileTree(providers.gradleProperty('compatModsDir').get()) { include '*.jar' }
+    }
     // Example mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"

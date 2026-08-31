@@ -41,6 +41,10 @@ Players can tweak almost every aspect of the mod in `createkineticinterference-s
 
 Configuration files are located in `/config/createkineticinterference-server.toml` and `/config/createkineticinterference-client.toml`.
 
+## Compatibility
+
+The compatibility update composes CKI's capacity, tooltip, and removal hooks with Create Picky Wheels and Flowing Fluids. Unloaded source records are preserved; stale records in loaded chunks are repaired automatically when queried. When using both addons, follow Create Picky Wheels' own Flowing Fluids configuration guidance for water-source requirements.
+
 ## 📄 License
 
 This project is licensed under the MIT License.

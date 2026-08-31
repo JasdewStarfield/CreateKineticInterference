@@ -40,7 +40,7 @@ public class KineticInterferenceManager {
     public static Set<BlockPos> getWindmillsInLevel(Level level) {
         if (level == null || level.isClientSide()) return Collections.emptySet();
         InterferenceNetworkData data = InterferenceNetworkData.get(level);
-        return data != null ? data.getWindmills() : Collections.emptySet();
+        return data != null ? data.getValidatedWindmills(level) : Collections.emptySet();
     }
 
     /**
@@ -69,6 +69,6 @@ public class KineticInterferenceManager {
     public static Set<BlockPos> getWaterWheelsInLevel(Level level) {
         if (level == null || level.isClientSide()) return Collections.emptySet();
         InterferenceNetworkData data = InterferenceNetworkData.get(level);
-        return data != null ? data.getWaterWheels() : Collections.emptySet();
+        return data != null ? data.getValidatedWaterWheels(level) : Collections.emptySet();
     }
 }

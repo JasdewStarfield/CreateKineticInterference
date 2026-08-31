@@ -102,15 +102,6 @@ public abstract class MixinWaterwheelBlockEntity extends GeneratingKineticBlockE
         }
     }
 
-    /**
-     * 当 BE 被移除时调用
-     */
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        KineticInterferenceHandler.invalidate(this, this.isChunkUnloaded());
-    }
-
     // --- 核心逻辑 ---
 
     /**
@@ -131,22 +122,10 @@ public abstract class MixinWaterwheelBlockEntity extends GeneratingKineticBlockE
     }
 
     /**
-     * 修改 calculateAddedStressCapacity
-     * 在返回结果前乘上效率系数
+     * 由发电机父类注入调用，只追加本模组提示，不覆盖其他模组的方法。
      */
     @Override
-    public float calculateAddedStressCapacity() {
-        return super.calculateAddedStressCapacity() * getEfficiencyFactor();
-    }
-
-    /**
-     * 护目镜提示信息
-     */
-    @Override
-    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        // 先调用父类逻辑（显示应力容量等基础信息）
-        boolean success = super.addToGoggleTooltip(tooltip, isPlayerSneaking);
-
+    public boolean appendInterferenceTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         // 只有当在运行且效率不为 100% 时才显示
         if (Math.abs(getGeneratedSpeed()) > 0 && custom$efficiencyFactor < 1.0f) {
             // 运行效率
@@ -163,14 +142,18 @@ public abstract class MixinWaterwheelBlockEntity extends GeneratingKineticBlockE
                     .forGoggles(tooltip);
 
             if (isPlayerSneaking) {
+                // 手动拆成两条护目镜文本，保留原文并避免长句撑宽整个面板。
                 CreateLang.text("  ")
                         .add(CreateLang.translate("hint.waterwheel.interference_hint_pre").style(ChatFormatting.DARK_GRAY))
+                        .forGoggles(tooltip);
+                CreateLang.text("  ")
                         .add(CreateLang.number(CreatekineticinterferenceConfig.SERVER.waterwheelInterferenceRadius.get()).style(ChatFormatting.GOLD))
                         .add(CreateLang.translate("hint.waterwheel.interference_hint").style(ChatFormatting.DARK_GRAY))
                         .forGoggles(tooltip);
             }
+            return true;
         }
 
-        return success;
+        return false;
     }
 }

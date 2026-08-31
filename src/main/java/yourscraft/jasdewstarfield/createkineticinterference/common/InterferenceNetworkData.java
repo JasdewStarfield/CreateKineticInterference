@@ -1,5 +1,7 @@
 package yourscraft.jasdewstarfield.createkineticinterference.common;
 
+import com.simibubi.create.content.contraptions.bearing.WindmillBearingBlockEntity;
+import com.simibubi.create.content.kinetics.waterwheel.WaterWheelBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -21,6 +23,10 @@ public class InterferenceNetworkData extends SavedData {
 
     private final Set<BlockPos> activeWindmills = new HashSet<>();
     private final Set<BlockPos> activeWaterWheels = new HashSet<>();
+
+    // 同一 tick 内多个动力源读取时只校验一次，避免反复查询同一批方块实体。
+    private long lastWindmillValidation = Long.MIN_VALUE;
+    private long lastWaterWheelValidation = Long.MIN_VALUE;
 
     public static InterferenceNetworkData load(CompoundTag nbt, HolderLookup.Provider provider) {
         InterferenceNetworkData data = new InterferenceNetworkData();
@@ -78,4 +84,29 @@ public class InterferenceNetworkData extends SavedData {
         if (activeWaterWheels.remove(pos)) setDirty();
     }
     public Set<BlockPos> getWaterWheels() { return activeWaterWheels; }
+
+    /** 逐步修复旧版本遗留的幽灵坐标，绝不为了校验而加载区块。 */
+    private void pruneMissingSources(Level level, Set<BlockPos> positions, Class<?> expectedType) {
+        boolean changed = positions.removeIf(pos -> level.hasChunkAt(pos)
+                && !expectedType.isInstance(level.getBlockEntity(pos)));
+        if (changed) setDirty();
+    }
+
+    /** 未加载区块的记录保留，已加载区块中被移除或替换的风车记录才删除。 */
+    public Set<BlockPos> getValidatedWindmills(Level level) {
+        if (lastWindmillValidation != level.getGameTime()) {
+            lastWindmillValidation = level.getGameTime();
+            pruneMissingSources(level, activeWindmills, WindmillBearingBlockEntity.class);
+        }
+        return activeWindmills;
+    }
+
+    /** 同时适用于小水车和继承 WaterWheelBlockEntity 的大水车。 */
+    public Set<BlockPos> getValidatedWaterWheels(Level level) {
+        if (lastWaterWheelValidation != level.getGameTime()) {
+            lastWaterWheelValidation = level.getGameTime();
+            pruneMissingSources(level, activeWaterWheels, WaterWheelBlockEntity.class);
+        }
+        return activeWaterWheels;
+    }
 }

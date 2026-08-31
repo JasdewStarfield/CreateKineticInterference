@@ -1,11 +1,19 @@
 package yourscraft.jasdewstarfield.createkineticinterference.common;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 
+import java.util.List;
 import java.util.Set;
 
 public interface IKineticInterference {
+
+    /** 追加干扰提示；返回是否添加了内容，保留原有护目镜返回值。 */
+    boolean appendInterferenceTooltip(List<Component> tooltip, boolean isPlayerSneaking);
+
+    /** 风车在共用父类中定期更新；水车继续使用自己的 lazyTick。 */
+    default void tickInterference() {}
 
     // --- 配置参数 ---
     float getEfficiencyFactor();

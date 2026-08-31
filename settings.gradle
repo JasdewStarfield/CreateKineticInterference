@@ -9,3 +9,6 @@ pluginManagement {
 plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
 }
+
+// 保留原项目名，避免版本目录重命名改变 Gradle 和 IDE 中的项目标识。
+rootProject.name = 'CreateKineticInterference'

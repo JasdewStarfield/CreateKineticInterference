@@ -18,9 +18,9 @@ public class KineticInterferenceHandler {
         compound.putInt("InterferenceCount", self.getNearbyCount());
 
         Set<BlockPos> sources = self.getInterferenceSources();
-        if (sources != null && !sources.isEmpty()) {
-            compound.putLongArray("InterferenceSources", sources.stream().mapToLong(BlockPos::asLong).toArray());
-        }
+        // 空列表也发送，确保最后一个干扰源移除后客户端会清除旧高亮。
+        compound.putLongArray("InterferenceSources", sources == null ? new long[0]
+                : sources.stream().mapToLong(BlockPos::asLong).toArray());
     }
 
     public static void read(IKineticInterference self, CompoundTag compound) {
