@@ -1,11 +1,30 @@
 # Changelog
 
+**English** | [简体中文](CHANGELOG_zh-CN.md)
+
 ## Unreleased
 
-- Split the existing Shift interference hint into two goggle lines without changing its wording, reducing tooltip width at large GUI scales.
-- Replace waterwheel/windmill capacity and goggle method overrides with scoped parent-class injections, allowing Create Picky Wheels' multipliers and tooltips to coexist.
-- Clean up interference tracking through `SmartBlockEntity.setRemoved`, preserving Flowing Fluids' `invalidate` implementation and the existing chunk-unload behavior.
-- Keep windmill tracking on the shared kinetic tick path even when another mod cancels the windmill's tick; assembled windmills with zero generated speed no longer count as active sources.
-- Repair saved positions that no longer contain the corresponding generator when their chunks are loaded. Unloaded chunks are never force-loaded or discarded by this repair.
-- Send empty interference-source lists so clients can clear stale highlights.
-- Add isolated GameTests and pinned optional-mod fixtures. Client tooltip rendering and natural fluid/biome interactions still require in-game acceptance.
+## 1.1 — 2026-10-04
+
+### Changed
+
+- Split the existing sneak hint into two Engineer's Goggles lines so it no longer stretches the tooltip at large GUI scales.
+- Reworked capacity, tooltip, tick and removal hooks around Create's shared block-entity paths, allowing other addons to compose their behavior with CKI.
+- Expanded and standardized the English and Simplified Chinese README files with matching installation, configuration, compatibility and troubleshooting information.
+
+### Fixed
+
+- Preserved Create Picky Wheels' waterwheel stress multipliers and its waterwheel and windmill tooltip additions.
+- Preserved Flowing Fluids' waterwheel invalidation behavior while still removing destroyed CKI sources.
+- Kept windmill interference tracking active when another addon cancels the windmill-specific tick path; assembled windmills that generate no speed no longer count as active sources.
+- Removed stale saved positions when their chunks are loaded and no matching generator remains, without force-loading unloaded chunks or discarding their records.
+- Synchronized empty interference-source lists so clients clear stale source highlights after the final source is removed.
+
+### Validation
+
+- Added isolated GameTests for capacity scaling, removal and chunk-unload behavior, saved-data repair, synchronization and windmill tracking.
+- Added a pinned compatibility-fixture script for Create Picky Wheels and Flowing Fluids. Visual tooltip behavior and natural fluid or biome interactions still require in-game checks.
+
+## 1.0 — 2026-01-18
+
+- Initial release.

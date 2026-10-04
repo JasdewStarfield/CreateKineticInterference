@@ -11,7 +11,7 @@
 ![Create](https://img.shields.io/badge/Create-6.0.9%2B-D9A441)
 ![License](https://img.shields.io/badge/License-MIT-3B82F6)
 
-[CurseForge](https://www.curseforge.com/minecraft/mc-mods/create-kinetic-interference) · [源码](https://github.com/JasdewStarfield/CreateKineticInterference) · [问题反馈](https://github.com/JasdewStarfield/CreateKineticInterference/issues) · [更新日志](CHANGELOG.md)
+[CurseForge](https://www.curseforge.com/minecraft/mc-mods/create-kinetic-interference) · [源码](https://github.com/JasdewStarfield/CreateKineticInterference) · [问题反馈](https://github.com/JasdewStarfield/CreateKineticInterference/issues) · [更新日志](CHANGELOG_zh-CN.md)
 
 **Create: Kinetic Interference（CKI，机械动力：动力干扰）** 是 [Create（机械动力）](https://www.curseforge.com/minecraft/mc-mods/create) 的附属模组，会降低彼此邻近的风车和水车的应力容量。它鼓励玩家分散布置免费动力源，避免在狭小区域密集堆叠，并为风车与水车提供独立的设置。
 
@@ -24,7 +24,7 @@
 
 ## 环境与安装
 
-本 README 描述当前 Minecraft 1.21.1 / NeoForge 源码。下载的发布版本不一定包含[更新日志](CHANGELOG.md)中 **Unreleased** 下的改动。
+本 README 描述当前 Minecraft 1.21.1 / NeoForge 源码。下载的发布版本不一定包含[更新日志](CHANGELOG_zh-CN.md)中“未发布”一节下的改动。
 
 | 项目 | 要求 |
 | --- | --- |
