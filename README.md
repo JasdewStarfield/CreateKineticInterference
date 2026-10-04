@@ -24,6 +24,8 @@
 - Optional highlights outline up to 64 nearby competitors. Gameplay calculation includes every competitor.
 - Existing worlds retain the legacy counting model until the administrator selects the density model and restarts.
 
+Running generators also show local power conditions relative to the baseline, such as “1.5× baseline”. Higher values mean more shared local power. This comparison and supply utilization are hidden while the generator is stopped.
+
 ## Requirements and installation
 
 This README describes the current source. Released downloads may precede the **Unreleased** changes in the [changelog](CHANGELOG.md).

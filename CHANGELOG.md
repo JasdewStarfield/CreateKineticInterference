@@ -4,6 +4,8 @@
 
 ## Unreleased
 
+- Goggles compare local power conditions with the baseline. This comparison and supply utilization are hidden while a generator is stopped.
+
 - Raw generator capacity now appears in gray parentheses beside the original output line. Preferred-biome rules inherit common river, ocean, mountain and hill tags for modded biomes.
 
 - Low-demand generators retain full output, with a sharper reduction near local capacity. Ordinary water supply is now 4096 SU and wind supply 6144 SU; built-in preferred biomes provide twice the supply.

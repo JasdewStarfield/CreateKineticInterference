@@ -19,5 +19,6 @@
   "create.hint.density.competitors": "竞争源数量：",
   "create.hint.density.estimated": "卸载估计源数量：",
   "create.hint.density.truncated": "仅高亮最近的 %s 个竞争源",
-  "create.hint.density.inactive": "供给利用效率：不适用"
+  "create.hint.density.conditions": "当地动力条件：",
+  "create.hint.density.baseline_multiplier": "基础的 %s 倍"
 }

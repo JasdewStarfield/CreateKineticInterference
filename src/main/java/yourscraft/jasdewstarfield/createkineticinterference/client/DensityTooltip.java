@@ -12,10 +12,16 @@ public final class DensityTooltip {
     public static boolean append(IKineticInterference source,List<Component> tooltip,boolean sneaking) {
         var data = ((DensityDiagnostics.View)source).cki$getDiagnostics();
         if (!data.enabled()) return false;
-        if(data.raw()==0)CreateLang.translate("hint.density.inactive").style(ChatFormatting.GRAY).forGoggles(tooltip);
-        else line(tooltip,"hint.density.efficiency",source.getEfficiencyFactor()*100,"%");
+        if (data.raw()>0) {
+            line(tooltip,"hint.density.efficiency",source.getEfficiencyFactor()*100,"%");
+            // 用基础的倍数说明当地条件；首次分配前没有有效基础值时等待同步。
+            if (data.baseDensity()>0) CreateLang.translate("hint.density.conditions").style(ChatFormatting.GRAY)
+                    .add(CreateLang.translate("hint.density.baseline_multiplier",
+                            CreateLang.number(data.localDensity()/data.baseDensity()).component()).style(ChatFormatting.GOLD))
+                    .forGoggles(tooltip);
+        }
         if (data.pending()) CreateLang.translate("hint.density.pending").style(ChatFormatting.GOLD).forGoggles(tooltip);
-        // 停转时没有覆盖分配，保留 N/A 与零输出，旧覆盖统计等待再次运行后更新。
+        // 停转时隐藏效率、当地条件和旧覆盖统计，等待再次运行后更新。
         if (data.raw()==0) return true;
         if (sneaking) {
             CreateLang.translate("hint.density.type."+data.type()).style(ChatFormatting.GRAY).forGoggles(tooltip);

@@ -85,7 +85,7 @@ public final class DensityUpdateScheduler {
             if(newEntity || !old.enabled() || old.raw()!=0) {
                 String type=be instanceof WindmillBearingBlockEntity?"wind":"water";
                 ((DensityDiagnostics.View)source).cki$setDiagnostics(new DensityDiagnostics(true,type,0,0,
-                        old.localDensity(),old.averageSupply(),settings.radii().get(type),field.sampleY(),0,true,profileVersion));
+                        old.localDensity(),old.averageSupply(),settings.radii().get(type),field.sampleY(),0,true,profileVersion,old.baseDensity()));
                 pendingSync.add(be);
             }
         } else {
@@ -100,7 +100,7 @@ public final class DensityUpdateScheduler {
             if (newEntity || !old.enabled() || old.raw()!=raw) {
                 ((DensityDiagnostics.View)source).cki$setDiagnostics(new DensityDiagnostics(true,type,raw,
                         Math.min(raw,committed.getOrDefault(pos.asLong(),0d)),old.localDensity(),old.averageSupply(),
-                        settings.radii().get(type),field.sampleY(),old.estimatedSources(),true,profileVersion));
+                        settings.radii().get(type),field.sampleY(),old.estimatedSources(),true,profileVersion,old.baseDensity()));
                 // 容量 RETURN 钩子此刻尚未写回缩放缓存；发送安排在维度 tick 末尾。
                 pendingSync.add(be);
             }
@@ -203,9 +203,11 @@ public final class DensityUpdateScheduler {
         int estimates=(int)peers.stream().filter(peer -> data.getDensitySources().get(BlockPos.of(peer.id())).estimated()).count();
         var highlights=new LinkedHashSet<BlockPos>();peers.stream().limit(64).forEach(peer -> highlights.add(BlockPos.of(peer.id())));
         double output=result.outputs().getOrDefault(id,0d);
+        // 基础供给密度随同服务端配置同步，客户端比较不依赖本地配置。
         var diagnostics=new DensityDiagnostics(true,record.resourceType(),record.rawPotentialSU(),output,
                 field.at(record.resourceType(),snapshot.x(),snapshot.z()),meanSupply(snapshot,result),snapshot.radius(),
-                field.sampleY(),estimates,false,jobProfileVersion);
+                field.sampleY(),estimates,false,jobProfileVersion,
+                settings.capacities().get(record.resourceType())/(Math.PI*snapshot.radius()*snapshot.radius()));
         preparations.put(id,new Preparation((float)Math.min(1,output/record.rawPotentialSU()),peers.size(),highlights,diagnostics));
     }
     private void commit(DensityAllocator.Result result) {
@@ -224,10 +226,10 @@ public final class DensityUpdateScheduler {
                     var old=((DensityDiagnostics.View)source).cki$getDiagnostics();
                     if(old.pending()||old.raw()!=0||source.getNearbyCount()!=0||old.enabled()&&old.version()!=profileVersion)changed.add(be);
                     source.setEfficiencyFactor(0); source.setNearbyCount(0); source.setInterferenceSources(Set.of());
-                    // 停转源不参与需求，仍保留零产出提示，效率显示为 N/A。
+                    // 停转源不参与需求，保留诊断以便恢复；客户端隐藏效率与当地条件。
                     ((DensityDiagnostics.View)source).cki$setDiagnostics(old.enabled()
                             ? new DensityDiagnostics(true,old.type(),0,0,old.localDensity(),old.averageSupply(),
-                                    old.radius(),old.sampleY(),0,false,profileVersion):DensityDiagnostics.EMPTY);
+                                    old.radius(),old.sampleY(),0,false,profileVersion,old.baseDensity()):DensityDiagnostics.EMPTY);
                     continue;
                 }
                 if(!result.outputs().containsKey(entry.getKey().asLong()))continue;

@@ -25,7 +25,7 @@ public class KineticInterferenceHandler {
             // 包含正在进行的批次状态；提交保护内写出的包显示已完成。
             diagnostics=new DensityDiagnostics(true,diagnostics.type(),diagnostics.raw(),diagnostics.output(),diagnostics.localDensity(),
                     diagnostics.averageSupply(),diagnostics.radius(),diagnostics.sampleY(),diagnostics.estimatedSources(),
-                    DensityUpdateScheduler.get(server).pending(),diagnostics.version());
+                    DensityUpdateScheduler.get(server).pending(),diagnostics.version(),diagnostics.baseDensity());
         }
         compound.put("DensityDiagnostics", diagnostics.write());
 

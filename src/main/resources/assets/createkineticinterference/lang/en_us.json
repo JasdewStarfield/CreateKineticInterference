@@ -19,5 +19,6 @@
   "create.hint.density.competitors": "Competing sources: ",
   "create.hint.density.estimated": "Estimated unloaded sources: ",
   "create.hint.density.truncated": "Showing the nearest %s competitors",
-  "create.hint.density.inactive": "Supply utilization: N/A"
+  "create.hint.density.conditions": "Local power conditions: ",
+  "create.hint.density.baseline_multiplier": "%s× baseline"
 }

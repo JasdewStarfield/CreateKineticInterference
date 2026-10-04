@@ -122,6 +122,13 @@ public class DensityGameTests {
                     "The same coordinate in another dimension must have an independent demand record");
             var be=wheel(helper,new BlockPos(2,2,2),false);service.observe(be);settle(helper,service);
             var packet=new CompoundTag();KineticInterferenceHandler.write((IKineticInterference)be,packet);
+            // 客户端的条件对比必须使用世界服务端配置，并在诊断包中完整保留基础值。
+            double radius=service.settings().radii().get("water");
+            double base=service.settings().capacities().get("water")/(Math.PI*radius*radius);
+            check(helper,Math.abs(diagnostics(be).baseDensity()-base)<1e-9,
+                    "Comparison baseline must use the active server supply settings");
+            check(helper,DensityDiagnostics.read(packet.getCompound("DensityDiagnostics")).baseDensity()==base,
+                    "Comparison baseline must survive diagnostic packet round trip");
             // 重建服务模拟重启后的空派生缓存，同样的原始 P 也必须清除保存的旧 O。
             DensityUpdateScheduler.unload(level);service=DensityUpdateScheduler.get(level);
             KineticInterferenceHandler.read((IKineticInterference)be,packet);service.observe(be);
@@ -235,7 +242,7 @@ public class DensityGameTests {
                     "A stale batch must not resurrect removed demand");
             check(helper,be.getOrCreateNetwork().getActualCapacityOf(be)==0,"Stale output must not return to the network");
             check(helper,diagnostics(be).enabled() && diagnostics(be).raw()==0 && diagnostics(be).output()==0,
-                    "Stopped generators retain zero-output diagnostics for an N/A efficiency tooltip");
+                    "Stopped generators retain zero-output diagnostics so the tooltip can hide operating information");
             for(var pos:ghosts)data.removeWaterWheel(pos);
             helper.setBlock(new BlockPos(2,2,2),Blocks.AIR);helper.succeed();
         });
