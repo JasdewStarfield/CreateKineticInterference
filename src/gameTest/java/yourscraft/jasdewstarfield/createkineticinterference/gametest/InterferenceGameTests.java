@@ -19,6 +19,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import yourscraft.jasdewstarfield.createkineticinterference.common.IKineticInterference;
 import yourscraft.jasdewstarfield.createkineticinterference.common.InterferenceNetworkData;
 import yourscraft.jasdewstarfield.createkineticinterference.common.KineticInterferenceHandler;
+import yourscraft.jasdewstarfield.createkineticinterference.common.density.SourceCapacityAdapter;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -75,6 +76,15 @@ public class InterferenceGameTests {
                 check(helper, Math.abs(((Number) field(be, "lastCapacityProvided")).floatValue() - expected) < 0.001f,
                         "Cached capacity must match the returned capacity");
             }
+            // 零效率也应采到完整原始 SU；验证作用域与缓存都恢复，防止反馈。
+            source.setEfficiencyFactor(0);
+            var cache = (SourceCapacityAdapter.CapacityCache) be;
+            cache.cki$setLastCapacity(123f);
+            double raw = SourceCapacityAdapter.potential(be);
+            check(helper, Math.abs(raw - expected * 2 * Math.abs(be.getGeneratedSpeed())) < 0.01,
+                    "Raw SU must retain add-on multipliers and ignore CKI");
+            check(helper, cache.cki$getLastCapacity() == 123f && !SourceCapacityAdapter.sampling(),
+                    "Sampling must restore cache and scope");
         }
         helper.succeed();
     }
