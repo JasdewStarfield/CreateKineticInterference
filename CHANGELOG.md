@@ -18,12 +18,6 @@
 - Limited new or increasing generator output until supply allocation completes. Competitor highlights show up to 64 sources and clear on disconnect or dimension changes.
 - Updated to Create 6.0.10; declared compatibility is `>=6.0.10, <6.1.0`. Requires NeoForge 21.1.219 or later.
 
-### Fixed
-
-- Fixed a client crash from an empty goggles tooltip when looking at a stopped waterwheel.
-
-Existing density configurations keep their values. To adopt the new balance, set `density.softCapPower` to `8`, water `referenceCapacitySU` to `4096`, and wind `referenceCapacitySU` to `6144`, then restart the world.
-
 ## 1.1 — 2026-10-04
 
 ### Changed
