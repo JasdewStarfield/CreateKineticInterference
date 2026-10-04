@@ -63,7 +63,8 @@ neoForge {
             type = "gameTestServer"
             sourceSet = sourceSets.gameTest
             gameDirectory = project.file(providers.gradleProperty('gameTestDir').getOrElse('run/gametest'))
-            systemProperty 'neoforge.enabledGameTestNamespaces', 'cki_tests'
+            systemProperty 'neoforge.enabledGameTestNamespaces', providers.gradleProperty('densityPerformance').isPresent()
+                    ? 'cki_density_perf' : providers.gradleProperty('densityTests').isPresent() ? 'cki_density' : 'cki_tests'
             systemProperty 'mixin.debug.export', 'true'
         }
 
@@ -150,6 +151,14 @@ dependencies {
 }
 
 tasks.named('test', Test) { useJUnitPlatform() }
+
+// 显式压力任务与常规单元测试分开，结果留在 build 或外层私有文档。
+tasks.register('densityBenchmark', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'yourscraft.jasdewstarfield.createkineticinterference.common.density.DensityBenchmark'
+    maxHeapSize = '2G'
+}
 
 // This block of code expands all declared replace properties in the specified resource targets.
 // A missing property will result in an error. Properties are expanded using ${} Groovy notation.
