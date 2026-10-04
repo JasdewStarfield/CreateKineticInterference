@@ -28,7 +28,7 @@ Running generators also show local power conditions relative to the baseline, su
 
 ## Requirements and installation
 
-This README describes the current source. Released downloads may precede the **Unreleased** changes in the [changelog](CHANGELOG.md).
+This README describes version 2.0 of the current source. Public downloads may still be an earlier version; see the [changelog](CHANGELOG.md).
 
 | Item | Requirement |
 | --- | --- |

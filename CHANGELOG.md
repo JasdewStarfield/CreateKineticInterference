@@ -2,22 +2,27 @@
 
 **English** | [简体中文](CHANGELOG_zh-CN.md)
 
-## Unreleased
+## 2.0 — 2026-10-05
+
+### Added
+
+- Windmills and waterwheels now share local power supply across heights and kinetic networks. Spreading generators over more land provides more power; wind and water supply remain independent.
+- Preferred biomes provide twice the ordinary supply. Biome rules inherit common river, ocean, mountain and hill tags to include modded biomes, and can be customized with datapacks.
+- Goggles show raw capacity in gray parentheses beside output, supply utilization and local power conditions relative to the baseline. Sneaking shows detailed conditions and competing sources; operating information is hidden while a generator is stopped.
+- Added operator commands to inspect generators, export samples and check pending updates, plus datapack rule reloads with `/reload`.
+
+### Changed
+
+- Low-demand generators retain full output. Efficiency falls rapidly near local capacity; default ordinary-biome reference supply is 4096 SU for water and 6144 SU for wind.
+- New worlds use the density model. Existing worlds retain LEGACY until the active server configuration is changed and the world restarted. Unloaded generators continue to compete using their last known demand; old records use marked estimates.
+- Limited new or increasing generator output until supply allocation completes. Competitor highlights show up to 64 sources and clear on disconnect or dimension changes.
+- Updated to Create 6.0.10; declared compatibility is `>=6.0.10, <6.1.0`. Requires NeoForge 21.1.219 or later.
+
+### Fixed
 
 - Fixed a client crash from an empty goggles tooltip when looking at a stopped waterwheel.
 
-- Goggles compare local power conditions with the baseline. This comparison and supply utilization are hidden while a generator is stopped.
-
-- Raw generator capacity now appears in gray parentheses beside the original output line. Preferred-biome rules inherit common river, ocean, mountain and hill tags for modded biomes.
-
-- Low-demand generators retain full output, with a sharper reduction near local capacity. Ordinary water supply is now 4096 SU and wind supply 6144 SU; built-in preferred biomes provide twice the supply.
-
-- Added continuous XZ supply sharing for windmills and waterwheels, with output-based competition, smooth biome conditions and configurable reference SU.
-- New worlds use the density model. Existing worlds retain LEGACY until an administrator changes the active server config and restarts; unloaded old records use visible estimates.
-- Added datapack biome profiles and atomic `/reload`, fixed-height environment sampling, and operator commands for source inspection, samples and pending work.
-- Expanded goggles with actual / raw SU and resource conditions; capped highlight synchronization at 64 competitors and cleared highlights on disconnect or dimension changes.
-- Preserved last known unloaded demand and limited new/increasing capability while an allocation batch is pending.
-- Updated the development baseline to Create 6.0.10 and NeoForge 21.1.219.
+Existing density configurations keep their values. To adopt the new balance, set `density.softCapPower` to `8`, water `referenceCapacitySU` to `4096`, and wind `referenceCapacitySU` to `6144`, then restart the world.
 
 ## 1.1 — 2026-10-04
 
