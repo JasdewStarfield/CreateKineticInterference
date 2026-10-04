@@ -8,6 +8,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
+import yourscraft.jasdewstarfield.createkineticinterference.common.density.DensityDiagnostics;
+import yourscraft.jasdewstarfield.createkineticinterference.common.density.DensityUpdateScheduler;
+import net.minecraft.server.level.ServerLevel;
+import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 
 public class KineticInterferenceHandler {
 
@@ -16,14 +20,25 @@ public class KineticInterferenceHandler {
     public static void write(IKineticInterference self, CompoundTag compound) {
         compound.putFloat("InterferenceEfficiency", self.getEfficiencyFactor());
         compound.putInt("InterferenceCount", self.getNearbyCount());
+        var diagnostics=((DensityDiagnostics.View)self).cki$getDiagnostics();
+        if(diagnostics.enabled() && self.getLevel() instanceof ServerLevel server) {
+            // 包含正在进行的批次状态；提交保护内写出的包显示已完成。
+            diagnostics=new DensityDiagnostics(true,diagnostics.type(),diagnostics.raw(),diagnostics.output(),diagnostics.localDensity(),
+                    diagnostics.averageSupply(),diagnostics.radius(),diagnostics.sampleY(),diagnostics.estimatedSources(),
+                    DensityUpdateScheduler.get(server).pending(),diagnostics.version());
+        }
+        compound.put("DensityDiagnostics", diagnostics.write());
 
         Set<BlockPos> sources = self.getInterferenceSources();
         // 空列表也发送，确保最后一个干扰源移除后客户端会清除旧高亮。
         compound.putLongArray("InterferenceSources", sources == null ? new long[0]
-                : sources.stream().mapToLong(BlockPos::asLong).toArray());
+                : sources.stream().sorted(java.util.Comparator.comparingLong(BlockPos::asLong)).limit(64).mapToLong(BlockPos::asLong).toArray());
+        compound.putBoolean("InterferenceSourcesTruncated", self.getNearbyCount() > 64);
     }
 
     public static void read(IKineticInterference self, CompoundTag compound) {
+        ((DensityDiagnostics.View) self).cki$setDiagnostics(compound.contains("DensityDiagnostics")
+                ? DensityDiagnostics.read(compound.getCompound("DensityDiagnostics")) : DensityDiagnostics.EMPTY);
         if (compound.contains("InterferenceEfficiency")) {
             self.setEfficiencyFactor(compound.getFloat("InterferenceEfficiency"));
         }
@@ -47,6 +62,11 @@ public class KineticInterferenceHandler {
     public static void updateTrackingState(IKineticInterference self, boolean isStressNonZero) {
         if (self.getLevel() == null || self.getLevel().isClientSide()) return;
 
+        if (DensityUpdateScheduler.enabled(self)) {
+            DensityUpdateScheduler.get((ServerLevel)self.getLevel()).observe((KineticBlockEntity)self);
+            return;
+        }
+
         if (isStressNonZero != self.isTracked()) {
             BlockPos pos = self.getBlockPos();
             if (isStressNonZero) {
@@ -63,6 +83,8 @@ public class KineticInterferenceHandler {
      * @param isChunkUnloaded 是否因区块卸载导致（如果是区块卸载，则不从全局数据中移除）
      */
     public static void invalidate(IKineticInterference self, boolean isChunkUnloaded) {
+        if (DensityUpdateScheduler.enabled(self))
+            DensityUpdateScheduler.get((ServerLevel)self.getLevel()).removed(self,isChunkUnloaded);
         if (self.getLevel() != null && !self.getLevel().isClientSide() && !isChunkUnloaded) {
             self.untrackSelf();
             self.setTracked(false);
@@ -79,6 +101,10 @@ public class KineticInterferenceHandler {
      */
     public static boolean performCalculation(IKineticInterference self, BlockEntity be) {
         if (self.getLevel() == null || self.getLevel().isClientSide()) return false;
+        if (DensityUpdateScheduler.enabled(self)) {
+            DensityUpdateScheduler.get((ServerLevel)self.getLevel()).observe((KineticBlockEntity)be);
+            return false;
+        }
 
         // 1. 准备参数
         double radius = self.getInterferenceRadius();
@@ -101,7 +127,7 @@ public class KineticInterferenceHandler {
 
         boolean efficiencyChanged = false;
         // 检测效率是否发生显著变化 (> 0.1%)
-        if (Math.abs(newEfficiency - self.getEfficiencyFactor()) > 0.001f) {
+        if (newEfficiency != self.getEfficiencyFactor()) {
             self.setEfficiencyFactor(newEfficiency);
             efficiencyChanged = true;
             dataChanged = true; // 效率变了，肯定需要同步 NBT

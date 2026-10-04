@@ -9,11 +9,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import yourscraft.jasdewstarfield.createkineticinterference.common.IKineticInterference;
 import yourscraft.jasdewstarfield.createkineticinterference.common.density.SourceCapacityAdapter;
+import yourscraft.jasdewstarfield.createkineticinterference.common.density.DensityDiagnostics;
+import org.spongepowered.asm.mixin.Unique;
+import yourscraft.jasdewstarfield.createkineticinterference.common.density.DensityUpdateScheduler;
+import net.minecraft.server.level.ServerLevel;
 
 /** 在共用父类中组合干扰效果，避免与水车/风车附属的同名覆写争用。 */
 @Mixin(KineticBlockEntity.class)
-public abstract class MixinKineticBlockEntity implements SourceCapacityAdapter.CapacityCache {
+public abstract class MixinKineticBlockEntity implements SourceCapacityAdapter.CapacityCache, DensityDiagnostics.View {
     @Shadow protected float lastCapacityProvided;
+    @Unique private DensityDiagnostics cki$diagnostics = DensityDiagnostics.EMPTY;
+    @Override public DensityDiagnostics cki$getDiagnostics() { return cki$diagnostics; }
+    @Override public void cki$setDiagnostics(DensityDiagnostics data) { cki$diagnostics = data; }
 
     // 仅暴露已核对的容量缓存，原始需求采样不得改变网络下一次读到的缓存。
     @Override public float cki$getLastCapacity() { return lastCapacityProvided; }
@@ -23,7 +30,7 @@ public abstract class MixinKineticBlockEntity implements SourceCapacityAdapter.C
     private void kineticInterference$scaleCapacity(CallbackInfoReturnable<Float> cir) {
         if (!SourceCapacityAdapter.sampling() && (Object) this instanceof IKineticInterference source) {
             // Picky Wheels 在 super 返回后继续乘环境倍率；这里仅应用一次干扰系数。
-            float capacity = cir.getReturnValueF() * source.getEfficiencyFactor();
+            float capacity = cir.getReturnValueF() * DensityUpdateScheduler.capacityFactor(source);
             lastCapacityProvided = capacity;
             cir.setReturnValue(capacity);
         }
@@ -33,7 +40,11 @@ public abstract class MixinKineticBlockEntity implements SourceCapacityAdapter.C
     private void kineticInterference$tick(CallbackInfo ci) {
         // Picky Wheels 即使取消风车 tick，仍会调用这条父类路径。
         if ((Object) this instanceof IKineticInterference source) {
-            source.tickInterference();
+            if (DensityUpdateScheduler.enabled(source)) {
+                var service = DensityUpdateScheduler.get((ServerLevel)source.getLevel());
+                if (Math.floorMod(source.getLevel().getGameTime()+source.getBlockPos().asLong(),service.settings().interval())==0)
+                    service.observe((KineticBlockEntity)(Object)this);
+            } else source.tickInterference();
         }
     }
 }

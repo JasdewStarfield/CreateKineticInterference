@@ -20,6 +20,8 @@ import yourscraft.jasdewstarfield.createkineticinterference.common.IKineticInter
 import yourscraft.jasdewstarfield.createkineticinterference.common.InterferenceNetworkData;
 import yourscraft.jasdewstarfield.createkineticinterference.common.KineticInterferenceHandler;
 import yourscraft.jasdewstarfield.createkineticinterference.common.density.SourceCapacityAdapter;
+import yourscraft.jasdewstarfield.createkineticinterference.common.density.WorldModelData;
+import yourscraft.jasdewstarfield.createkineticinterference.common.density.CalculationModel;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -32,6 +34,7 @@ import java.util.Set;
 public class InterferenceGameTests {
     @GameTest(template = "empty")
     public static void capacityMultipliersCompose(GameTestHelper helper) {
+        check(helper,WorldModelData.get(helper.getLevel())==CalculationModel.LEGACY,"Legacy regression must use LEGACY world model");
         List<BlockState> states = List.of(AllBlocks.WATER_WHEEL.getDefaultState(),
                 AllBlocks.LARGE_WATER_WHEEL.getDefaultState(), AllBlocks.WINDMILL_BEARING.getDefaultState());
         boolean picky = ModList.get().isLoaded("createpickywheels");

@@ -1,13 +1,24 @@
 {
   "create.hint.interference_efficiency": "Stress Efficiency: ",
-
   "create.hint.windmill.interference_source_pre": "Interfered by  ",
   "create.hint.windmill.interference_source": " windmill(s) nearby",
   "create.hint.windmill.interference_hint_pre": "It seems that other windmill(s) within ",
   "create.hint.windmill.interference_hint": " blocks have affected the air flow",
-
   "create.hint.waterwheel.interference_source_pre": "Interfered by  ",
   "create.hint.waterwheel.interference_source": " waterwheel(s) nearby",
   "create.hint.waterwheel.interference_hint_pre": "It seems that other waterwheel(s) within ",
-  "create.hint.waterwheel.interference_hint": " blocks have affected the water current"
+  "create.hint.waterwheel.interference_hint": " blocks have affected the water current",
+  "create.hint.density.efficiency": "Supply utilization: ",
+  "create.hint.density.output": "Actual / raw output",
+  "create.hint.density.pending": "Supply allocation pending",
+  "create.hint.density.type.water": "Resource: water",
+  "create.hint.density.type.wind": "Resource: wind",
+  "create.hint.density.local": "Local supply: ",
+  "create.hint.density.average": "Mean covered supply: ",
+  "create.hint.density.radius": "Collection radius: ",
+  "create.hint.density.height": "Biome sample Y: ",
+  "create.hint.density.competitors": "Competing sources: ",
+  "create.hint.density.estimated": "Estimated unloaded sources: ",
+  "create.hint.density.truncated": "Showing the nearest %s competitors",
+  "create.hint.density.inactive": "Supply utilization: N/A"
 }

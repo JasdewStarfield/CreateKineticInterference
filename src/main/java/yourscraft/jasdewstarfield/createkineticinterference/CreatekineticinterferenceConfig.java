@@ -3,6 +3,7 @@ package yourscraft.jasdewstarfield.createkineticinterference;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 import yourscraft.jasdewstarfield.createkineticinterference.common.DistanceType;
+import yourscraft.jasdewstarfield.createkineticinterference.common.density.CalculationModel;
 
 public class CreatekineticinterferenceConfig {
     public static final ServerConfig SERVER;
@@ -15,6 +16,10 @@ public class CreatekineticinterferenceConfig {
     }
 
     public static class ServerConfig {
+        public final ModConfigSpec.EnumValue<CalculationModel> calculationModel;
+        public final ModConfigSpec.DoubleValue integrationStep, softCapPower, environmentGridStep, biomeBlendRadius, workBudgetMs;
+        public final ModConfigSpec.IntValue biomeSampleY, recheckInterval;
+        public final DensityTypeConfig waterDensity, windDensity;
         public final ModConfigSpec.DoubleValue windmillInterferenceRadius;
         public final ModConfigSpec.EnumValue<DistanceType> windmillDistanceType;
         public final ModConfigSpec.DoubleValue windmillInterferenceFactor;
@@ -24,7 +29,24 @@ public class CreatekineticinterferenceConfig {
         public final ModConfigSpec.DoubleValue waterwheelInterferenceFactor;
 
         ServerConfig(ModConfigSpec.Builder builder) {
-            builder.push("general");
+            calculationModel = builder.comment("AUTO: new worlds use DENSITY, existing worlds keep their saved model.",
+                    "Back up world and config before changing. Model changes require restart.")
+                    .worldRestart().defineEnum("calculationModel", CalculationModel.AUTO);
+            builder.push("density");
+            integrationStep = builder.comment("Shared XZ integration spacing; must be <= each radius/4. Restart required.")
+                    .worldRestart().defineInRange("integrationStep", 2d, 0.5, 16);
+            softCapPower = builder.worldRestart().defineInRange("softCapPower", 4d, 2, 8);
+            environmentGridStep = builder.worldRestart().defineInRange("environmentGridStep", 4d, 1, 16);
+            biomeBlendRadius = builder.worldRestart().defineInRange("biomeBlendRadius", 8d, 0, 64);
+            biomeSampleY = builder.comment("Fixed biome-source sampling height; clamped to dimension build limits.")
+                    .worldRestart().defineInRange("biomeSampleY", 64, -2048, 2048);
+            recheckInterval = builder.worldRestart().defineInRange("recheckInterval", 40, 1, 1000);
+            workBudgetMs = builder.comment("Target solver work per tick; an individual source/node may exceed this target.")
+                    .worldRestart().defineInRange("workBudgetMs", 1.25d, 0.1, 20);
+            waterDensity = new DensityTypeConfig(builder,"water",2048,256);
+            windDensity = new DensityTypeConfig(builder,"wind",32768,4096);
+            builder.pop();
+            builder.comment("Legacy count-model settings; ignored by DENSITY.").push("general");
 
             builder.push("windmill");
 
@@ -75,6 +97,23 @@ public class CreatekineticinterferenceConfig {
                     .comment("Suggested value: 0.1 ~ 1")
                     .defineInRange("interferenceFactor", 0.1, 0.0, 10.0);
 
+            builder.pop();
+        }
+    }
+
+    /** 固定 SU 配置便于服主调节集中建设规模，不根据设备台数反推容量。 */
+    public static class DensityTypeConfig {
+        public final ModConfigSpec.DoubleValue collectionRadius, referenceCapacitySU, legacyUnloadedPotentialSU;
+        public final ModConfigSpec.ConfigValue<String> profile;
+        DensityTypeConfig(ModConfigSpec.Builder builder,String type,double reference,double legacyPotential) {
+            builder.push(type);
+            collectionRadius = builder.comment("Euclidean XZ collection radius; competitors can overlap up to 2R away.")
+                    .worldRestart().defineInRange("collectionRadius",16d,2,64);
+            referenceCapacitySU = builder.comment("Ordinary-biome supply within one collection circle, in SU.")
+                    .worldRestart().defineInRange("referenceCapacitySU",reference,0,1e12);
+            legacyUnloadedPotentialSU = builder.comment("Estimated SU for old unloaded coordinate-only records.")
+                    .worldRestart().defineInRange("legacyUnloadedPotentialSU",legacyPotential,0,1e12);
+            profile = builder.worldRestart().define("profile","createkineticinterference:"+type);
             builder.pop();
         }
     }

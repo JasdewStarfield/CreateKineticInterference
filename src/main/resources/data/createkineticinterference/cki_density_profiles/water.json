@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "resource_type": "water",
+  "default_multiplier": 1.0,
+  "rules": [
+    {
+      "biome_tag": "createkineticinterference:water_abundant",
+      "priority": 100,
+      "multiplier": 1.5
+    }
+  ]
+}

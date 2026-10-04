@@ -99,9 +99,7 @@ public class MixinWindmillBearingBlockEntity extends MechanicalBearingBlockEntit
 
     /**
      * 风车状态更新（组装/拆卸/变向）时触发。
-     * 这确保了：
-     * 1. 刚组装的风车立即被注册到 Manager。
-     * 2. 刚组装的风车立即计算一次效率，玩家无需等待。
+     * 立即登记原始能力；密度模式交给维度调度器，旧模式直接更新效率。
      */
     @Inject(method = "updateGeneratedRotation", at = @At("HEAD"))
     private void onUpdateGeneratedRotation(CallbackInfo ci) {
@@ -110,7 +108,7 @@ public class MixinWindmillBearingBlockEntity extends MechanicalBearingBlockEntit
         // 立即更新追踪状态
         KineticInterferenceHandler.updateTrackingState(this, isActiveSource());
 
-        // 如果处于运行状态，立即进行一次计算
+        // 运行源通知当前模型；密度路径只更新需求快照，不在旋转回调里求解。
         if (isActiveSource()) {
             KineticInterferenceHandler.performCalculation(this, this);
         }

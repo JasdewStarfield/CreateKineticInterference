@@ -21,12 +21,24 @@ import yourscraft.jasdewstarfield.createkineticinterference.common.IKineticInter
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraft.client.Minecraft;
 
 @EventBusSubscriber(modid = Createkineticinterference.MODID, value = Dist.CLIENT)
 public class InterferenceClientHandler {
 
     // 存储高亮目标及其过期时间
     private static final Map<BlockPos, Long> HIGHLIGHTS = new ConcurrentHashMap<>();
+    private static BlockPos inspectedSource;
+
+    /** 换维度与断线释放历史高亮，避免相同坐标在另一维度被误标。 */
+    @SubscribeEvent public static void onUnload(LevelEvent.Unload event) {
+        if (event.getLevel().isClientSide()) { HIGHLIGHTS.clear(); inspectedSource=null; }
+    }
+    @SubscribeEvent public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
+        HIGHLIGHTS.clear(); inspectedSource=null;
+    }
 
     @SubscribeEvent
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
@@ -47,6 +59,8 @@ public class InterferenceClientHandler {
         BlockEntity be = event.getLevel().getBlockEntity(event.getPos());
         if (be instanceof IKineticInterference interference) {
 
+            HIGHLIGHTS.clear(); inspectedSource=event.getPos().immutable();
+
             Set<BlockPos> sources = interference.getInterferenceSources();
 
             if (sources == null || sources.isEmpty()) {
@@ -63,6 +77,12 @@ public class InterferenceClientHandler {
 
     @SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
+        if (inspectedSource != null && Minecraft.getInstance().level != null) {
+            var be = Minecraft.getInstance().level.getBlockEntity(inspectedSource);
+            if (be instanceof IKineticInterference source)
+                HIGHLIGHTS.keySet().removeIf(pos -> !source.getInterferenceSources().contains(pos));
+            else { HIGHLIGHTS.clear(); inspectedSource=null; }
+        }
         if (!CreatekineticinterferenceClientConfig.CLIENT.enableDebugHighlights.get()) {
             HIGHLIGHTS.clear();
             return;

@@ -120,3 +120,6 @@ runs/
 
 # Internal planning and acceptance documents belong to the parent workspace repository.
 /docs/
+
+# Read-only admin sample exports stay local to the server.
+/cki-diagnostics/

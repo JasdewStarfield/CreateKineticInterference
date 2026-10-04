@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import yourscraft.jasdewstarfield.createkineticinterference.common.IKineticInterference;
 
 import java.util.List;
+import yourscraft.jasdewstarfield.createkineticinterference.client.DensityTooltip;
+import yourscraft.jasdewstarfield.createkineticinterference.common.density.DensityDiagnostics;
 
 /** 保留 Create 的基础提示，也让调用 super 的附属继续添加自己的提示。 */
 @Mixin(GeneratingKineticBlockEntity.class)
@@ -17,7 +19,8 @@ public abstract class MixinGeneratingKineticBlockEntity {
     private void kineticInterference$appendTooltip(List<Component> tooltip, boolean sneaking,
                                                    CallbackInfoReturnable<Boolean> cir) {
         if ((Object) this instanceof IKineticInterference source
-                && source.appendInterferenceTooltip(tooltip, sneaking)) {
+                && (((DensityDiagnostics.View)source).cki$getDiagnostics().enabled()
+                ? DensityTooltip.append(source,tooltip,sneaking) : source.appendInterferenceTooltip(tooltip,sneaking))) {
             // 即使父类没有添加内容，新增的干扰信息也应该让护目镜显示面板。
             cir.setReturnValue(true);
         }
