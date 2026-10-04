@@ -4,6 +4,8 @@
 
 ## Unreleased
 
+- Fixed a client crash from an empty goggles tooltip when looking at a stopped waterwheel.
+
 - Goggles compare local power conditions with the baseline. This comparison and supply utilization are hidden while a generator is stopped.
 
 - Raw generator capacity now appears in gray parentheses beside the original output line. Preferred-biome rules inherit common river, ocean, mountain and hill tags for modded biomes.

@@ -243,6 +243,16 @@ public class DensityGameTests {
             check(helper,be.getOrCreateNetwork().getActualCapacityOf(be)==0,"Stale output must not return to the network");
             check(helper,diagnostics(be).enabled() && diagnostics(be).raw()==0 && diagnostics(be).output()==0,
                     "Stopped generators retain zero-output diagnostics so the tooltip can hide operating information");
+            // Create 根据返回值删除分隔行；空提示必须返回 false，否则会删除索引 -1。
+            List<net.minecraft.network.chat.Component> tooltip=new ArrayList<>();
+            boolean added=yourscraft.jasdewstarfield.createkineticinterference.client.DensityTooltip
+                    .append((IKineticInterference)be,tooltip,false);
+            if(added)tooltip.remove(tooltip.size()-1);
+            check(helper,!added && tooltip.isEmpty(),"Stopped source must not advertise an empty tooltip");
+            tooltip.add(net.minecraft.network.chat.Component.literal("Existing addon information"));
+            check(helper,!yourscraft.jasdewstarfield.createkineticinterference.client.DensityTooltip
+                            .append((IKineticInterference)be,tooltip,true) && tooltip.size()==1,
+                    "Stopped source must preserve existing tooltip content without reporting new lines");
             for(var pos:ghosts)data.removeWaterWheel(pos);
             helper.setBlock(new BlockPos(2,2,2),Blocks.AIR);helper.succeed();
         });
