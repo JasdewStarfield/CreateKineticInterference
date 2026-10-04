@@ -4,6 +4,13 @@
 
 ## Unreleased
 
+- Added continuous XZ supply sharing for windmills and waterwheels, with output-based competition, smooth biome conditions and configurable reference SU.
+- New worlds use the density model. Existing worlds retain LEGACY until an administrator changes the active server config and restarts; unloaded old records use visible estimates.
+- Added datapack biome profiles and atomic `/reload`, fixed-height environment sampling, and operator commands for source inspection, samples and pending work.
+- Expanded goggles with actual / raw SU and resource conditions; capped highlight synchronization at 64 competitors and cleared highlights on disconnect or dimension changes.
+- Preserved last known unloaded demand and limited new/increasing capability while an allocation batch is pending.
+- Updated the development baseline to Create 6.0.11 and NeoForge 21.1.219.
+
 ## 1.1 — 2026-10-04
 
 ### Changed
