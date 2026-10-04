@@ -205,6 +205,14 @@ public class DensityGameTests {
                 check(helper,DensityProfiles.version()==version && service.field().at("water",0.5,0.5)==rho,"Failure must retain complete previous field snapshot");
             }
             check(helper,DensityProfiles.reload(resources,level.registryAccess(),"createkineticinterference:water","createkineticinterference:wind"),"Original profiles must restore");
+            // 测试包只扩展通用标签，验证 CKI 能继承其他数据包或模组添加的成员。
+            var biomes=level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BIOME);
+            check(helper,DensityProfiles.get("createkineticinterference:water","water").multiplier(
+                    biomes.getHolderOrThrow(net.minecraft.world.level.biome.Biomes.DESERT))==2,
+                    "Water profile must inherit added common river tag members");
+            check(helper,DensityProfiles.get("createkineticinterference:wind","wind").multiplier(
+                    biomes.getHolderOrThrow(net.minecraft.world.level.biome.Biomes.BADLANDS))==2,
+                    "Wind profile must inherit added common hill tag members");
             settle(helper,service);helper.succeed();
         });
     }

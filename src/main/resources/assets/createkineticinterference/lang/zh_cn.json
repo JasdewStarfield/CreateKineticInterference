@@ -9,7 +9,6 @@
   "create.hint.waterwheel.interference_hint_pre": "看起来周围 ",
   "create.hint.waterwheel.interference_hint": " 格内的其它水车影响了水流",
   "create.hint.density.efficiency": "供给利用效率：",
-  "create.hint.density.output": "实际 / 原始产出",
   "create.hint.density.pending": "供给分配待更新",
   "create.hint.density.type.water": "资源类型：水力",
   "create.hint.density.type.wind": "资源类型：风力",

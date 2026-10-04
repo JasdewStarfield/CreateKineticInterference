@@ -1,23 +1,8 @@
 {
   "replace": false,
   "values": [
-    "minecraft:ocean",
-    "minecraft:deep_ocean",
-    "minecraft:cold_ocean",
-    "minecraft:deep_cold_ocean",
-    "minecraft:lukewarm_ocean",
-    "minecraft:deep_lukewarm_ocean",
-    "minecraft:warm_ocean",
-    "minecraft:frozen_ocean",
-    "minecraft:deep_frozen_ocean",
-    "minecraft:windswept_hills",
-    "minecraft:windswept_forest",
-    "minecraft:windswept_gravelly_hills",
-    "minecraft:meadow",
-    "minecraft:grove",
-    "minecraft:snowy_slopes",
-    "minecraft:frozen_peaks",
-    "minecraft:jagged_peaks",
-    "minecraft:stony_peaks"
+    "#c:is_ocean",
+    "#c:is_mountain",
+    "#c:is_hill"
   ]
 }

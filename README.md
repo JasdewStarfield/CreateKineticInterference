@@ -20,7 +20,7 @@
 - Windmills compete for wind supply. Small and large waterwheels share water supply, in proportion to their raw output. The two resources are independent.
 - Generators at the same horizontal position share supply across heights and kinetic networks. Supply changes smoothly as you move across the world.
 - Rivers support larger waterwheel arrays; mountain and ocean biomes support larger windmill arrays. Biome conditions are sampled at a fixed height, default Y=64.
-- Engineer's Goggles show supply efficiency and actual / raw SU, including pending allocation. Sneaking adds resource conditions, competitor counts and estimated unloaded sources.
+- Engineer's Goggles show supply efficiency, with raw SU in gray parentheses beside the output, including pending allocation. Sneaking adds resource conditions, competitor counts and estimated unloaded sources.
 - Optional highlights outline up to 64 nearby competitors. Gameplay calculation includes every competitor.
 - Existing worlds retain the legacy counting model until the administrator selects the density model and restarts.
 
@@ -88,7 +88,7 @@ Configuration paths below combine the TOML section and key. Density mode uses Eu
 | `density.water.legacyUnloadedPotentialSU` | `256` | Estimated demand for unloaded old waterwheel records |
 | `density.wind.legacyUnloadedPotentialSU` | `4096` | Estimated demand for unloaded old windmill records |
 
-Built-in abundant-biome rules multiply supply by 2. Water uses rivers and frozen rivers. Wind uses ocean variants, windswept hills/forests, meadows, groves, snowy slopes and mountain peaks. All sources in the same XZ column use the same sampling height.
+Built-in abundant-biome rules multiply supply by 2. Water uses the common river biome tag. Wind uses the common ocean, mountain and hill biome tags, including modded biomes registered in these tags. All sources in the same XZ column use the same sampling height.
 
 ### Existing worlds and model changes
 

@@ -7,16 +7,13 @@ import yourscraft.jasdewstarfield.createkineticinterference.common.IKineticInter
 import yourscraft.jasdewstarfield.createkineticinterference.common.density.DensityDiagnostics;
 import java.util.List;
 
-/** 护目镜只展示同步的服务端数值；每个量独立成行，便于不同语言与缩放阅读。 */
+/** 护目镜只展示同步的服务端数值；原始容量合并到 Create 产出行，其余诊断独立显示。 */
 public final class DensityTooltip {
     public static boolean append(IKineticInterference source,List<Component> tooltip,boolean sneaking) {
         var data = ((DensityDiagnostics.View)source).cki$getDiagnostics();
         if (!data.enabled()) return false;
         if(data.raw()==0)CreateLang.translate("hint.density.inactive").style(ChatFormatting.GRAY).forGoggles(tooltip);
         else line(tooltip,"hint.density.efficiency",source.getEfficiencyFactor()*100,"%");
-        CreateLang.translate("hint.density.output").style(ChatFormatting.GRAY).forGoggles(tooltip);
-        CreateLang.number(data.output()).text(" / ").add(CreateLang.number(data.raw())).text(" SU")
-                .style(ChatFormatting.AQUA).forGoggles(tooltip,1);
         if (data.pending()) CreateLang.translate("hint.density.pending").style(ChatFormatting.GOLD).forGoggles(tooltip);
         // 停转时没有覆盖分配，保留 N/A 与零输出，旧覆盖统计等待再次运行后更新。
         if (data.raw()==0) return true;

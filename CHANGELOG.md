@@ -4,6 +4,8 @@
 
 ## Unreleased
 
+- Raw generator capacity now appears in gray parentheses beside the original output line. Preferred-biome rules inherit common river, ocean, mountain and hill tags for modded biomes.
+
 - Low-demand generators retain full output, with a sharper reduction near local capacity. Ordinary water supply is now 4096 SU and wind supply 6144 SU; built-in preferred biomes provide twice the supply.
 
 - Added continuous XZ supply sharing for windmills and waterwheels, with output-based competition, smooth biome conditions and configurable reference SU.
