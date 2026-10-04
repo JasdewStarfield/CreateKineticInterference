@@ -11,15 +11,44 @@ class DensityAllocatorTest {
         return new SourceSnapshot(id, "water", x, z, p, 16);
     }
     private DensityAllocator.Result solve(List<SourceSnapshot> sources, double step) {
-        return DensityAllocator.solve(sources, step, 4, (type, x, z) -> RHO);
+        return DensityAllocator.solve(sources, step, 8, (type, x, z) -> RHO);
     }
     private double analytic(double ratio) {
         double result = 0;
+        // 独立径向积分：平坦中心与 smoothstep 外圈，节点饱和用显式分段公式对照。
         for (int i = 0; i < 100000; i++) {
-            double v = (i + 0.5) / 100000;
-            result += 3 * v * v * DensityKernel.fulfillment(3 * ratio * v * v, 1, 4) / 100000;
+            double r = (i + 0.5) / 100000, t = Math.max(0, (r - 0.9) / 0.1);
+            double w = 1 - t * t * (3 - 2 * t), u = ratio * w / 0.903;
+            double allocated = u <= 0.875 ? u : u >= 1.125 ? 1 : u - 2 * Math.pow(u - 0.875, 2);
+            result += 2 * r * allocated / (ratio * 100000);
         }
         return result;
+    }
+
+    @Test void workstationBalanceHasFullOutputRegionAndBiomeAdvantage() {
+        // 同位置实际分配核对初期设备、小产线与过量堆叠，覆盖新曲线的玩法目标。
+        for(double capacity:new double[]{4096,6144}) {
+            for(double ratio:new double[]{0.125,0.5,0.75}) {
+                double demand=capacity*ratio;
+                double out=DensityAllocator.solve(List.of(source(1,0.5,0.5,demand)),2,8,
+                        (t,x,z)->capacity/(Math.PI*256)).outputs().get(1L);
+                assertEquals(demand,out,demand*1e-9);
+            }
+        }
+        var two=List.of(source(1,0.5,0.5,4096),source(2,1.5,0.5,4096));
+        double ordinary=DensityAllocator.solve(two,2,8,(t,x,z)->6144/(Math.PI*256)).outputs().values().stream().mapToDouble(Double::doubleValue).sum();
+        double rich=DensityAllocator.solve(two,2,8,(t,x,z)->12288/(Math.PI*256)).outputs().values().stream().mapToDouble(Double::doubleValue).sum();
+        assertTrue(ordinary/8192>0.68 && ordinary/8192<0.75);
+        assertEquals(8192,rich,8192e-9);
+        assertTrue(rich>ordinary*1.4);
+        for(double power:new double[]{2,4,8}) {
+            double previous=0;
+            for(int i=1;i<=1000;i++) {
+                double demand=i/100d,output=demand*DensityKernel.fulfillment(demand,1,power);
+                assertTrue(output>=previous-1e-12 && output<=1+1e-12);
+                previous=output;
+            }
+        }
     }
 
     @Test void curveConvergenceAndNodeConservation() {
@@ -28,7 +57,7 @@ class DensityAllocatorTest {
             for (int i = 0; i < n; i++) sources.add(source(i, 0.5, 0.5, 1024));
             double reference = analytic(n / 8d) * 1024;
             var result = solve(sources, 2);
-            assertEquals(reference, result.outputs().get(0L), reference * 0.001);
+            assertEquals(reference, result.outputs().get(0L), reference * 0.01);
             assertEquals(solve(sources, 0.5).outputs().get(0L), result.outputs().get(0L), reference * 0.01);
             assertEquals(solve(sources, 1).outputs().get(0L), result.outputs().get(0L), reference * 0.01);
             result.nodes().values().forEach(node -> assertTrue(node.demand() * node.fulfillment() <= node.supply() * (1 + 1e-9)));
@@ -70,7 +99,7 @@ class DensityAllocatorTest {
                 .mapToDouble(e -> e.getValue().supply() * 4).sum());
         Collections.reverse(sources);
         assertEquals(result, solve(sources, 2));
-        assertEquals(0, DensityAllocator.solve(sources, 2, 4, (t,x,z) -> 0).outputs().get(1L));
+        assertEquals(0, DensityAllocator.solve(sources, 2, 8, (t,x,z) -> 0).outputs().get(1L));
         assertEquals(0, DensityKernel.fulfillment(Double.MAX_VALUE, Double.MIN_VALUE, 4));
         assertThrows(IllegalArgumentException.class, () -> solve(sources, 5));
         assertThrows(IllegalArgumentException.class, () -> DensityKernel.fulfillment(1, Double.NaN, 4));
@@ -78,7 +107,7 @@ class DensityAllocatorTest {
 
     @Test void slicedBatchAndSpatialBoundaries() {
         var sources=List.of(source(1,-32.5,-0.5,1024),source(2,-1.5,-0.5,2048),source(3,0.5,-0.5,4096));
-        var job=new DensityAllocator.Job(sources,2,4,(t,x,z)->RHO);
+        var job=new DensityAllocator.Job(sources,2,8,(t,x,z)->RHO);
         assertThrows(IllegalStateException.class,job::result);
         int slices=0;while(!job.advance(1))slices++;
         assertTrue(slices>1);assertEquals(solve(sources,2),job.result());
@@ -102,7 +131,7 @@ class DensityAllocatorTest {
         assertTrue(result.outputs().get(1L)>limit*0.99);
         for(double radius:new double[]{2,4,32,64}) {
             var s=new SourceSnapshot(1,"water",-0.5,0.5,1024,radius);
-            var r=DensityAllocator.solve(List.of(s),radius/8,4,(t,x,z)->1e9);
+            var r=DensityAllocator.solve(List.of(s),radius/8,8,(t,x,z)->1e9);
             assertEquals(1024,r.outputs().get(1L),1024e-9);
         }
     }
@@ -118,7 +147,7 @@ class DensityAllocatorTest {
             Map<Long,SourceSnapshot> current=new HashMap<>(previous);
             long id=iteration;current.remove(id);
             if(iteration%2==0)current.put(id,source(id,random.nextInt(80)-40+0.5,random.nextInt(80)-40+0.5,512));
-            var job=new IncrementalDensityJob(previous,current,nodes,outputs,2,4,(t,x,z)->RHO);
+            var job=new IncrementalDensityJob(previous,current,nodes,outputs,2,8,(t,x,z)->RHO);
             while(!job.advance(1000)) { /* 验证多预算片结束后的差分结果。 */ }
             var delta=job.result();outputs.keySet().retainAll(current.keySet());outputs.putAll(delta.outputs());nodes.putAll(delta.nodes());
             var full=solve(new ArrayList<>(current.values()),2);

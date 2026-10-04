@@ -30,13 +30,13 @@ public final class DensityProfiles {
     }
     private static Map<ResourceLocation, Profile> defaults() {
         Map<ResourceLocation,Double> water = new HashMap<>(), wind = new HashMap<>();
-        for (String name : List.of("river","frozen_river")) water.put(ResourceLocation.withDefaultNamespace(name),1.5);
+        for (String name : List.of("river","frozen_river")) water.put(ResourceLocation.withDefaultNamespace(name),2.0);
         for (String name : List.of("ocean","deep_ocean","cold_ocean","deep_cold_ocean","lukewarm_ocean","deep_lukewarm_ocean",
                 "warm_ocean","frozen_ocean","deep_frozen_ocean","windswept_hills","windswept_forest","windswept_gravelly_hills",
                 "meadow","grove","snowy_slopes","frozen_peaks","jagged_peaks","stony_peaks"))
-            wind.put(ResourceLocation.withDefaultNamespace(name),1.5);
-        return Map.of(id("water"), new Profile("water", 1, List.of(new Rule(id("water_abundant"),100,1.5)),Map.of(),Map.copyOf(water)),
-                id("wind"), new Profile("wind",1,List.of(new Rule(id("wind_abundant"),100,1.5)),Map.of(),Map.copyOf(wind)));
+            wind.put(ResourceLocation.withDefaultNamespace(name),2.0);
+        return Map.of(id("water"), new Profile("water", 1, List.of(new Rule(id("water_abundant"),100,2.0)),Map.of(),Map.copyOf(water)),
+                id("wind"), new Profile("wind",1,List.of(new Rule(id("wind_abundant"),100,2.0)),Map.of(),Map.copyOf(wind)));
     }
     public static long version() { return version; }
     public static Profile get(String id, String type) {
@@ -104,7 +104,7 @@ public final class DensityProfiles {
                 var config=yourscraft.jasdewstarfield.createkineticinterference.CreatekineticinterferenceConfig.SERVER;
                 var typeConfig=profile.type().equals("water")?config.waterDensity:config.windDensity;
                 boolean configLoaded=yourscraft.jasdewstarfield.createkineticinterference.CreatekineticinterferenceConfig.SERVER_SPEC.isLoaded();
-                double capacity=configLoaded?typeConfig.referenceCapacitySU.get():profile.type().equals("water")?2048:32768;
+                double capacity=configLoaded?typeConfig.referenceCapacitySU.get():profile.type().equals("water")?4096:6144;
                 double radius=configLoaded?typeConfig.collectionRadius.get():16;
                 double maximumBiome=Math.max(profile.defaultMultiplier(),profile.rules().stream().mapToDouble(Rule::multiplier).max().orElse(0));
                 double maximumDimension=Math.max(1,profile.dimensions().values().stream().mapToDouble(Double::doubleValue).max().orElse(1));

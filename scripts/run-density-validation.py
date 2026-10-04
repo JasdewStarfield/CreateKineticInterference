@@ -10,9 +10,10 @@ ROOT = Path(__file__).resolve().parents[1]
 SCENARIOS = ("baseline", "picky", "flowing", "both")
 
 
-def run_scenario(model, scenario):
+def run_scenario(model, scenario, tag):
     # This script owns only validation directories under run/ and build/; player worlds stay separate.
-    game_dir = ROOT / "run" / f"validation-{model.lower()}-{scenario}"
+    suffix = f"-{tag}" if tag else ""
+    game_dir = ROOT / "run" / f"validation-{model.lower()}-{scenario}{suffix}"
     config = game_dir / "config" / "createkineticinterference-server.toml"
     config.parent.mkdir(parents=True, exist_ok=True)
     text = config.read_text(encoding="utf-8") if config.exists() else ""
@@ -35,7 +36,7 @@ def run_scenario(model, scenario):
         if expected != actual:
             raise RuntimeError(f"Unexpected compatibility fixtures: expected {expected}, found {actual}")
         args.append(f"-PcompatModsDir={mods}")
-    log = ROOT / "build" / f"validation-{model.lower()}-{scenario}.log"
+    log = ROOT / "build" / f"validation-{model.lower()}-{scenario}{suffix}.log"
     with log.open("w", encoding="utf-8") as output:
         result = subprocess.run(args, cwd=ROOT, stdout=output, stderr=subprocess.STDOUT)
     content = log.read_text(encoding="utf-8", errors="replace")
@@ -51,10 +52,14 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--models", nargs="+", choices=("LEGACY", "DENSITY"), default=("LEGACY", "DENSITY"))
     parser.add_argument("--scenarios", nargs="+", choices=SCENARIOS, default=SCENARIOS)
+    # 独立目录让默认值平衡验证使用新配置，并保留上一轮运行证据。
+    parser.add_argument("--run-tag", default="")
     args = parser.parse_args()
+    if args.run_tag and not re.fullmatch(r"[a-z0-9-]+", args.run_tag):
+        parser.error("--run-tag must contain only lowercase letters, digits and hyphens")
     for model in args.models:
         for scenario in args.scenarios:
-            run_scenario(model, scenario)
+            run_scenario(model, scenario, args.run_tag)
 
 
 if __name__ == "__main__":

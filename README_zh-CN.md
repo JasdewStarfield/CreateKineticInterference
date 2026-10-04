@@ -13,7 +13,7 @@
 
 [CurseForge](https://www.curseforge.com/minecraft/mc-mods/create-kinetic-interference) · [源码](https://github.com/JasdewStarfield/CreateKineticInterference) · [问题反馈](https://github.com/JasdewStarfield/CreateKineticInterference/issues) · [更新日志](CHANGELOG_zh-CN.md)
 
-**Create: Kinetic Interference（CKI，机械动力：动力干扰）** 为 Create 风车与水车提供共享的当地应力供给。少量设备保留几乎全部产出，密集阵列的总容量逐渐饱和；扩大建设范围可以获得更多动力。
+**Create: Kinetic Interference（CKI，机械动力：动力干扰）** 为 Create 风车与水车提供共享的当地应力供给。低需求设备保持满效，密集阵列的总容量逐渐饱和；扩大建设范围可以获得更多动力。
 
 ## 功能
 
@@ -44,7 +44,7 @@
 2. 建造两台水平距离小于 32 格、能够正常运行的小水车。每台水车应能自行产生转速，可以接入不同动力网络。
 3. 佩戴工程师护目镜查看水车，等待供给分配完成。继续在同一区域增加水车，比较总 SU。
 
-少量设备保留大部分原始容量，集中建设更多设备时效率逐渐下降。增加设备间距或向新的区域扩建，可以使用更多供给。CKI 调整应力容量，转速由 Create 管理。
+低需求设备保持原始容量，集中建设并逼近当地容量时效率快速下降。增加设备间距或向新的区域扩建，可以使用更多供给。CKI 调整应力容量，转速由 Create 管理。
 
 需要查看竞争源时，在客户端配置中启用 `visuals.enableDebugHighlights`，重启客户端，然后佩戴护目镜并潜行（默认 `Shift`）右键动力源。高亮默认持续 3 秒。
 
@@ -74,11 +74,11 @@
 | `calculationModel` | `AUTO` | 使用世界保存的选择；新世界选择 DENSITY，检测到旧世界或旧配置时选择 LEGACY |
 | `density.water.collectionRadius` | `16` | 水力采集半径，单位格 |
 | `density.wind.collectionRadius` | `16` | 风力采集半径，单位格 |
-| `density.water.referenceCapacitySU` | `2048` | 普通群系单个采集圆的水力参考供给 |
-| `density.wind.referenceCapacitySU` | `32768` | 普通群系单个采集圆的风力参考供给 |
+| `density.water.referenceCapacitySU` | `4096` | 普通群系单个采集圆的水力参考供给 |
+| `density.wind.referenceCapacitySU` | `6144` | 普通群系单个采集圆的风力参考供给 |
 | `density.water.profile` | `createkineticinterference:water` | 水力群系规则 |
 | `density.wind.profile` | `createkineticinterference:wind` | 风力群系规则 |
-| `density.softCapPower` | `4` | 渐进饱和曲线的形状，范围 2～8 |
+| `density.softCapPower` | `8` | 饱和拐点锐度，越大越接近容量上限才开始降效；范围 2～8 |
 | `density.integrationStep` | `2` | 积分间距，最多为各类型采集半径的四分之一 |
 | `density.environmentGridStep` | `4` | 环境采样间距 |
 | `density.biomeBlendRadius` | `8` | 群系平滑半径 |
@@ -88,9 +88,13 @@
 | `density.water.legacyUnloadedPotentialSU` | `256` | 旧版未加载水车坐标的需求估计值 |
 | `density.wind.legacyUnloadedPotentialSU` | `4096` | 旧版未加载风车坐标的需求估计值 |
 
-内置丰富群系将供给乘以 1.5。水力包括河流与冻结河流；风力包括海洋系列、风袭丘陵和森林、草甸、树林、积雪山坡及山峰。同一 XZ 列的设备采用相同采样高度。
+内置丰富群系将供给乘以 2。水力包括河流与冻结河流；风力包括海洋系列、风袭丘陵和森林、草甸、树林、积雪山坡及山峰。同一 XZ 列的设备采用相同采样高度。
 
 ### 旧世界与模型切换
+
+已有密度配置会保留原数值。采用新版平衡时，停止世界后将 `density.softCapPower` 改为 `8`、水力 `referenceCapacitySU` 改为 `4096`、风力改为 `6144`，然后重启。内置优选群系供给提高到两倍；自定义数据包继续使用自己的规则。
+
+在均匀普通群系、同一 XZ 的参考布局中，需求低于约 75% 圆容量时保持满效，接近容量后快速削减。单台 4096 SU 风车可满效，两台约 69%；均匀优选群系的两台可满效。实际布局、群系边界和采集范围会改变结果。
 
 1. 备份世界及其实际生效的 CKI 服务端配置。
 2. 尽量加载现有生产区域，核实设备并替换旧坐标的估计需求。
@@ -117,7 +121,7 @@ LEGACY 使用原有的 `general.windmill`、`general.waterwheel` 半径、系数
   "resource_type": "water",
   "default_multiplier": 1.0,
   "rules": [
-    { "biome_tag": "createkineticinterference:water_abundant", "priority": 100, "multiplier": 1.5 }
+    { "biome_tag": "createkineticinterference:water_abundant", "priority": 100, "multiplier": 2.0 }
   ],
   "dimension_multipliers": { "minecraft:the_nether": 0.5 }
 }

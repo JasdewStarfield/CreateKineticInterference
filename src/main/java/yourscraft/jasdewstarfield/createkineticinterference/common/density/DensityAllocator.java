@@ -43,7 +43,12 @@ public final class DensityAllocator {
                 if (sourceIndex < sources.size()) project(sources.get(sourceIndex++));
                 else {
                     if (nodes == null) nodes = grid.entrySet().iterator();
-                    if (!nodes.hasNext()) { complete = true; return true; }
+                    if (!nodes.hasNext()) {
+                        // 满效区间会精确累加到 P，消除双精度求和产生的微小超出。
+                        for (var source : sources) outputs.computeIfPresent(source.id(),
+                                (id,output) -> Math.max(0,Math.min(source.potential(),output)));
+                        complete = true; return true;
+                    }
                     allocate(nodes.next());
                 }
             } while (System.nanoTime()-start < budgetNanos);

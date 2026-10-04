@@ -42,7 +42,7 @@ public final class DensityFieldService {
             int reach = (int) Math.ceil(blend / step);
             double sum = 0, weights = 0;
             for (int dx = -reach; dx <= reach; dx++) for (int dz = -reach; dz <= reach; dz++) {
-                double weight = DensityKernel.weight(dx*step,dz*step,blend);
+                double weight = DensityKernel.environmentWeight(dx*step,dz*step,blend);
                 if (weight == 0) continue;
                 sum += raw(type,x+dx,z+dz)*weight; weights += weight;
             }

@@ -74,6 +74,8 @@ public class DensityGameTests {
             double single=diagnostics(first).output();
             var second=wheel(helper,new BlockPos(2,6,2),true);
             check(helper,second.calculateAddedStressCapacity()==0,"New stacked source must have no committed allowance");
+            // 低需求现在保持满效；增加真实垂直水车，使共享供给进入饱和区再检查竞争。
+            for(int i=0;i<8;i++)wheel(helper,new BlockPos(2,10+4*i,2),true);
             settle(helper,service);capacityMatches(helper,first);capacityMatches(helper,second);
             check(helper,diagnostics(first).output()<single,"Same XZ different Y must share supply across separate networks");
             double secondRaw=SourceCapacityAdapter.potential(second);
@@ -90,6 +92,8 @@ public class DensityGameTests {
             service.observe(first);settle(helper,service);
             check(helper,((IKineticInterference)first).isTracked(),"Overloaded generator must remain in demand");
             helper.setBlock(new BlockPos(2,6,2),Blocks.AIR);settle(helper,service);
+            for(int i=0;i<8;i++)helper.setBlock(new BlockPos(2,10+4*i,2),Blocks.AIR);
+            settle(helper,service);
             check(helper,((IKineticInterference)first).getNearbyCount()==0,"Destroyed peer must disappear without restart");
             capacityMatches(helper,first);
             System.out.println("CKI raw fixture smallSU="+raw+" largeSU="+secondRaw+" final="+service.stats());
@@ -110,7 +114,7 @@ public class DensityGameTests {
             var tag=data.save(new CompoundTag(),level.registryAccess());
             var restored=InterferenceNetworkData.load(tag,level.registryAccess());
             check(helper,restored.getDensitySources().get(old).equals(data.getDensitySources().get(old)),"Source record must round trip");
-            check(helper,tag.getInt("schemaVersion")==2 && tag.getInt("modelVersion")==1,"SavedData must be versioned");
+            check(helper,tag.getInt("schemaVersion")==2 && tag.getInt("modelVersion")==2,"SavedData must be versioned");
             service.field().at("water",old.getX(),old.getZ());
             check(helper,!level.hasChunkAt(old),"Environment sampling must not load or generate chunks");
             var nether=level.getServer().getLevel(net.minecraft.world.level.Level.NETHER);

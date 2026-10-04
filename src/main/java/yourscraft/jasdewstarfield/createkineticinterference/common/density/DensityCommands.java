@@ -56,7 +56,7 @@ public final class DensityCommands {
                 +" outputSU="+output+" efficiency="+(record.rawPotentialSU()==0?0:output/record.rawPotentialSU())
                 +" rho="+allocation.supply()+" D="+allocation.demand()+" a="+allocation.fulfillment()
                 +" loaded="+loaded+" validation="+record.validationState()+" validatedTick="+record.lastValidatedGameTime()
-                +" profile="+service.settings().profiles().get(record.resourceType())+" profileVersion="+DensityProfiles.version()+" modelVersion=1"
+                +" profile="+service.settings().profiles().get(record.resourceType())+" profileVersion="+DensityProfiles.version()+" modelVersion=2"
                 +" "+service.sourceCounts(record)+" pending="+service.pending()); return 1;
     }
     private static int sample(CommandSourceStack source,String type,BlockPos center,double radius,double step) {

@@ -4,6 +4,8 @@
 
 ## Unreleased
 
+- Low-demand generators retain full output, with a sharper reduction near local capacity. Ordinary water supply is now 4096 SU and wind supply 6144 SU; built-in preferred biomes provide twice the supply.
+
 - Added continuous XZ supply sharing for windmills and waterwheels, with output-based competition, smooth biome conditions and configurable reference SU.
 - New worlds use the density model. Existing worlds retain LEGACY until an administrator changes the active server config and restarts; unloaded old records use visible estimates.
 - Added datapack biome profiles and atomic `/reload`, fixed-height environment sampling, and operator commands for source inspection, samples and pending work.

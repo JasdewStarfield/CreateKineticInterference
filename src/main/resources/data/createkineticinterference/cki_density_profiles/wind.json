@@ -6,7 +6,7 @@
     {
       "biome_tag": "createkineticinterference:wind_abundant",
       "priority": 100,
-      "multiplier": 1.5
+      "multiplier": 2.0
     }
   ]
 }

@@ -63,7 +63,7 @@ public class InterferenceNetworkData extends SavedData {
         compound.putLongArray("ActiveWindmills", activeWindmills.stream().mapToLong(BlockPos::asLong).toArray());
         compound.putLongArray("ActiveWaterWheels", activeWaterWheels.stream().mapToLong(BlockPos::asLong).toArray());
         compound.putInt("schemaVersion",2);
-        compound.putInt("modelVersion",1);
+        compound.putInt("modelVersion",2);
         var records = new ListTag();
         densitySources.values().stream().sorted(java.util.Comparator.comparingLong(r -> r.pos().asLong())).forEach(record -> {
             var entry = new CompoundTag();

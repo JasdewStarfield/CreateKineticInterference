@@ -13,7 +13,7 @@
 
 [CurseForge](https://www.curseforge.com/minecraft/mc-mods/create-kinetic-interference) · [Source](https://github.com/JasdewStarfield/CreateKineticInterference) · [Issues](https://github.com/JasdewStarfield/CreateKineticInterference/issues) · [Changelog](CHANGELOG.md)
 
-**Create: Kinetic Interference (CKI)** gives Create windmills and waterwheels a shared local supply of stress capacity. A few generators keep nearly all of their output; dense arrays gradually approach the capacity of the area they cover. Spreading generators over more land makes room for more power.
+**Create: Kinetic Interference (CKI)** gives Create windmills and waterwheels a shared local supply of stress capacity. Low-demand generators retain full output; dense arrays gradually approach the capacity of the area they cover. Spreading generators over more land makes room for more power.
 
 ## Features
 
@@ -74,11 +74,11 @@ Configuration paths below combine the TOML section and key. Density mode uses Eu
 | `calculationModel` | `AUTO` | Use the world's saved choice; new worlds select DENSITY, detected old worlds/configs select LEGACY |
 | `density.water.collectionRadius` | `16` | Water collection radius in blocks |
 | `density.wind.collectionRadius` | `16` | Wind collection radius in blocks |
-| `density.water.referenceCapacitySU` | `2048` | Ordinary-biome reference water supply within a collection circle |
-| `density.wind.referenceCapacitySU` | `32768` | Ordinary-biome reference wind supply within a collection circle |
+| `density.water.referenceCapacitySU` | `4096` | Ordinary-biome reference water supply within a collection circle |
+| `density.wind.referenceCapacitySU` | `6144` | Ordinary-biome reference wind supply within a collection circle |
 | `density.water.profile` | `createkineticinterference:water` | Water biome rules |
 | `density.wind.profile` | `createkineticinterference:wind` | Wind biome rules |
-| `density.softCapPower` | `4` | Shape of the gradual saturation curve, range 2–8 |
+| `density.softCapPower` | `8` | Saturation knee sharpness: higher values delay reductions until closer to capacity, range 2–8 |
 | `density.integrationStep` | `2` | Integration spacing; at most one quarter of each collection radius |
 | `density.environmentGridStep` | `4` | Environment sampling spacing |
 | `density.biomeBlendRadius` | `8` | Biome smoothing radius |
@@ -88,9 +88,13 @@ Configuration paths below combine the TOML section and key. Density mode uses Eu
 | `density.water.legacyUnloadedPotentialSU` | `256` | Estimated demand for unloaded old waterwheel records |
 | `density.wind.legacyUnloadedPotentialSU` | `4096` | Estimated demand for unloaded old windmill records |
 
-Built-in abundant-biome rules multiply supply by 1.5. Water uses rivers and frozen rivers. Wind uses ocean variants, windswept hills/forests, meadows, groves, snowy slopes and mountain peaks. All sources in the same XZ column use the same sampling height.
+Built-in abundant-biome rules multiply supply by 2. Water uses rivers and frozen rivers. Wind uses ocean variants, windswept hills/forests, meadows, groves, snowy slopes and mountain peaks. All sources in the same XZ column use the same sampling height.
 
 ### Existing worlds and model changes
+
+Existing density configs retain their values. To adopt the new balance, stop the world, set `density.softCapPower` to `8`, water `referenceCapacitySU` to `4096`, and wind to `6144`, then restart. Built-in preferred biomes provide twice the ordinary supply; custom datapacks retain their own rules.
+
+For coincident sources in a uniform ordinary biome, demand below about 75% of circle capacity stays at full output, then efficiency falls quickly near capacity. One 4096 SU windmill can run at full output; two achieve about 69%. In a uniform preferred biome, both can run at full output. Layout, biome boundaries and collection coverage affect the result.
 
 1. Back up the world and its active CKI server configuration.
 2. Load production areas to validate generators and replace old coordinate-only estimates where possible.
@@ -117,7 +121,7 @@ Add a JSON resource to an existing Minecraft 1.21.1 datapack, for example `data/
   "resource_type": "water",
   "default_multiplier": 1.0,
   "rules": [
-    { "biome_tag": "createkineticinterference:water_abundant", "priority": 100, "multiplier": 1.5 }
+    { "biome_tag": "createkineticinterference:water_abundant", "priority": 100, "multiplier": 2.0 }
   ],
   "dimension_multipliers": { "minecraft:the_nether": 0.5 }
 }

@@ -35,7 +35,8 @@ public class CreatekineticinterferenceConfig {
             builder.push("density");
             integrationStep = builder.comment("Shared XZ integration spacing; must be <= each radius/4. Restart required.")
                     .worldRestart().defineInRange("integrationStep", 2d, 0.5, 16);
-            softCapPower = builder.worldRestart().defineInRange("softCapPower", 4d, 2, 8);
+            softCapPower = builder.comment("Saturation knee sharpness; larger values keep full output closer to the local supply limit.")
+                    .worldRestart().defineInRange("softCapPower", 8d, 2, 8);
             environmentGridStep = builder.worldRestart().defineInRange("environmentGridStep", 4d, 1, 16);
             biomeBlendRadius = builder.worldRestart().defineInRange("biomeBlendRadius", 8d, 0, 64);
             biomeSampleY = builder.comment("Fixed biome-source sampling height; clamped to dimension build limits.")
@@ -43,8 +44,8 @@ public class CreatekineticinterferenceConfig {
             recheckInterval = builder.worldRestart().defineInRange("recheckInterval", 40, 1, 1000);
             workBudgetMs = builder.comment("Target solver work per tick; an individual source/node may exceed this target.")
                     .worldRestart().defineInRange("workBudgetMs", 1.25d, 0.1, 20);
-            waterDensity = new DensityTypeConfig(builder,"water",2048,256);
-            windDensity = new DensityTypeConfig(builder,"wind",32768,4096);
+            waterDensity = new DensityTypeConfig(builder,"water",4096,256);
+            windDensity = new DensityTypeConfig(builder,"wind",6144,4096);
             builder.pop();
             builder.comment("Legacy count-model settings; ignored by DENSITY.").push("general");
 
