@@ -8,7 +8,7 @@
 
 ![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1-5C9E31)
 ![Loader](https://img.shields.io/badge/Loader-NeoForge-E58B32)
-![Create](https://img.shields.io/badge/Create-6.0.11-D9A441)
+![Create](https://img.shields.io/badge/Create-6.0.10-D9A441)
 ![License](https://img.shields.io/badge/License-MIT-3B82F6)
 
 [CurseForge](https://www.curseforge.com/minecraft/mc-mods/create-kinetic-interference) · [Source](https://github.com/JasdewStarfield/CreateKineticInterference) · [Issues](https://github.com/JasdewStarfield/CreateKineticInterference/issues) · [Changelog](CHANGELOG.md)
@@ -34,7 +34,7 @@ This README describes the current source. Released downloads may precede the **U
 | Loader | NeoForge `21.1.219` or later for Minecraft 1.21.1 |
 | Java | `21` |
 | Install on | Client and server |
-| Create | Current build: `6.0.11-313`; declared range: `[6.0.11,6.1.0)` |
+| Create | Current build: `6.0.10`; declared range: `[6.0.10,6.1.0)` |
 
 Install matching CKI versions on client and server, together with Create and its dependencies. Place the JARs in each instance's `mods/` folder. Create Picky Wheels and Flowing Fluids are optional.
 

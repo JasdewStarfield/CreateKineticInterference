@@ -8,7 +8,7 @@
 
 ![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1-5C9E31)
 ![Loader](https://img.shields.io/badge/Loader-NeoForge-E58B32)
-![Create](https://img.shields.io/badge/Create-6.0.11-D9A441)
+![Create](https://img.shields.io/badge/Create-6.0.10-D9A441)
 ![License](https://img.shields.io/badge/License-MIT-3B82F6)
 
 [CurseForge](https://www.curseforge.com/minecraft/mc-mods/create-kinetic-interference) · [源码](https://github.com/JasdewStarfield/CreateKineticInterference) · [问题反馈](https://github.com/JasdewStarfield/CreateKineticInterference/issues) · [更新日志](CHANGELOG_zh-CN.md)
@@ -34,7 +34,7 @@
 | 加载器 | Minecraft 1.21.1 的 NeoForge `21.1.219` 或以上 |
 | Java | `21` |
 | 安装端 | 客户端与服务端 |
-| Create | 当前构建使用 `6.0.11-313`，声明范围为 `[6.0.11,6.1.0)` |
+| Create | 当前构建使用 `6.0.10`，声明范围为 `[6.0.10,6.1.0)` |
 
 客户端与服务端安装一致的 CKI，并安装 Create 及其依赖。将 JAR 放入各实例的 `mods/` 目录。Create Picky Wheels 与 Flowing Fluids 为可选附属。
 
